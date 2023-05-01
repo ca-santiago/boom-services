@@ -73,7 +73,6 @@ export class FlujoController {
       limits: { files: 1 },
       fileFilter: function (req, file, callback) {
         let ext = path.extname(file.originalname);
-        console.log(ext);
         req.ext = ext;
         if (ext !== '.mp4' && ext !== '.webm')
           return callback(

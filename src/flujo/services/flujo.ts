@@ -147,7 +147,6 @@ export class FlujoService {
    */
   async putPersonalData(dto: PutPersonalDataDTO) {
     const tokenPayload = this.verifyStepAccesToken(dto.accessToken);
-    console.log({ tokenPayload, dto });
     if (tokenPayload === null) throw new UnauthorizedException();
 
     // Trying to edit a different resource.
@@ -178,7 +177,6 @@ export class FlujoService {
    */
   async putSignature(dto: PutSignatureDTO) {
     const tokenPayload = this.verifyStepAccesToken(dto.accessToken);
-    console.log({ tokenPayload, dto });
     if (tokenPayload === null) throw new UnauthorizedException();
 
     // Trying to edit a different resource.

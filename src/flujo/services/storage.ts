@@ -13,7 +13,6 @@ export class StorageService {
    * @return file name
    */
   async saveFile(data: Buffer, ext: string, name: string): Promise<string> {
-    console.log(baseDir);
     const sanitizedExt = ext[0] == '.' ? ext : `.${ext}`;
     const nameWithExtension = name + sanitizedExt;
     fs.writeFileSync(path.join(baseDir, `public/${nameWithExtension}`), data);
