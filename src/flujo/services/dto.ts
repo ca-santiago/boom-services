@@ -3,8 +3,6 @@ import {
   ArrayMinSize,
   ArrayUnique,
   IsArray,
-  isDate,
-  IsDate,
   IsDateString,
   IsEmail,
   IsIn,

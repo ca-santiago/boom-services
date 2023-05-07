@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Flujo } from '../domain/flujo';
-import { FlujoType } from '../interfaces/flujo';
 import { FlujoPublicDTO } from '../interfaces/flujo.dto';
 import { FlujoRepoDTO } from '../interfaces/flujo.repo';
 

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { FaceId } from '../domain/faceid';
-import { IFaceId } from '../interfaces/faceid';
 import { FaceidPublicDTO } from '../interfaces/faceid.dto';
 import { FaceidRepoDTO } from '../interfaces/faceid.repo';
 
