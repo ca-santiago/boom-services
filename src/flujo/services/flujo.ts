@@ -20,6 +20,7 @@ import { FaceidRepo } from '../repository/faceid';
 import { FlujoRepo } from '../repository/flujo';
 import { PersonalinfoRepo } from '../repository/personalinfo';
 import { SignatureRepo } from '../repository/signature';
+
 // DTOs
 import {
   CreateFlujoDTO,
@@ -27,12 +28,11 @@ import {
   PutPersonalDataDTO,
   PutSignatureDTO,
 } from './dto';
-import { StorageService } from './storage';
+import { ObjectStorageService } from 'src/shared/services/objectStorage';
 
 @Injectable()
 export class FlujoService {
   constructor(
-    private storageService: StorageService,
     private flujoRepo: FlujoRepo,
     private jwtService: JwtService,
     private faceidRepo: FaceidRepo,
@@ -41,6 +41,7 @@ export class FlujoService {
     private signatureMapper: SignatureMapper,
     private personalInfoRepo: PersonalinfoRepo,
     private personalInfoMapper: PersonalInfoMapper,
+    private fileStorageService: ObjectStorageService,
   ) { }
 
   async createFlujo(
@@ -119,20 +120,25 @@ export class FlujoService {
     await this.findFlujoAndVerifyType(dto.flujoId, StepType.FACE);
 
     // Let's save the file
-    const fileURI = await this.storageService.saveFile(
-      dto.file,
-      dto.ext,
-      dto.flujoId + '-faceid',
-    );
+    // const fileURI = await this.storageService.saveFile(
+    //   dto.file,
+    //   dto.ext,
+    //   dto.flujoId + '-faceid',
+    // );
 
     // Search for an already created faceid for using its id
     const faceidOrNull = await this.faceidRepo.findByFlujoId(dto.flujoId);
 
+    const id = faceidOrNull ? faceidOrNull : v4();
+
+    // Save file using s3
+    await this.fileStorageService.uploadFile(dto.file.buffer, id, dto.file.mimetype);
+
     // Let's create the faceid step instance
     // if already exist one for the current flujo, use it's id.
     const faceidInstance = new FaceId(
-      faceidOrNull ? faceidOrNull : v4(),
-      fileURI,
+      id,
+      id,
       moment().format(),
       dto.flujoId,
     );
@@ -185,20 +191,24 @@ export class FlujoService {
     await this.findFlujoAndVerifyType(dto.flujoId, StepType.SIGNATURE);
 
     // Let's save the file
-    const fileURI = await this.storageService.saveFile(
-      dto.file,
-      dto.extension,
-      dto.flujoId + '-signature',
-    );
+    // const fileURI = await this.storageService.saveFile(
+    //   dto.file,
+    //   dto.extension,
+    //   dto.flujoId + '-signature',
+    // );
 
     // Search for an already created faceid for using its id
     const signatureOrNull = await this.faceidRepo.findByFlujoId(dto.flujoId);
 
+    const id = signatureOrNull ? signatureOrNull : v4();
+
+    await this.fileStorageService.uploadFile(dto.file.buffer, id, dto.file.mimetype);
+
     // Let's create the faceid step instance
     // if already exist one for the current flujo, use it's id.
     const signatureInstance = new Signature(
-      signatureOrNull ? signatureOrNull : v4(),
-      fileURI,
+      id,
+      id,
       moment().format(),
       dto.flujoId,
     );

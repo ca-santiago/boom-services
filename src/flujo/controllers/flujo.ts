@@ -96,7 +96,7 @@ export class FlujoController {
     if (!file) throw new BadRequestException('Should provide file');
     await this.flujoService.putFaceId({
       ...dto,
-      file: file.buffer,
+      file,
       flujoId: id,
       ext: req['ext'],
     });
@@ -131,7 +131,7 @@ export class FlujoController {
     await this.flujoService.putSignature({
       ...dto,
       extension,
-      file: file.buffer,
+      file,
       flujoId: id,
     });
     return;

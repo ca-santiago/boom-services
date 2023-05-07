@@ -31,7 +31,7 @@ export class PutFaceidDTO {
 
   flujoId: string;
 
-  file: Buffer;
+  file: Express.Multer.File;
 
   ext: string;
 }
@@ -59,8 +59,15 @@ export class PutPersonalDataDTO {
 }
 
 export class PutSignatureDTO {
+
+  @IsString()
   accessToken: string;
+
+  @IsString()
   flujoId: string;
-  file: Buffer;
+
+  file: Express.Multer.File;
+
+  @IsString()
   extension: string;
 }

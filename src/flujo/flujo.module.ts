@@ -17,18 +17,9 @@ import { SignatureRepo } from './repository/signature';
 import { SignatureSchema } from './repository/signature.schema';
 import { FaceIdService } from './services/faceId';
 import { FlujoService } from './services/flujo';
-import { StorageService } from './services/storage';
 import { ObjectStorageService } from 'src/shared/services/objectStorage';
 import { S3Service } from 'src/shared/services/aws';
-import { S3ClientConfig } from '@aws-sdk/client-s3';
 
-const s3Creds: S3ClientConfig = {
-  credentials: {
-    accessKeyId: process.env.AWS_S3_ACCESSKEY,
-    secretAccessKey: process.env.AWS_S3_SECRETKEY,
-  },
-  region: process.env.AWS_S3_REGION,
-};
 
 @Module({
   imports: [
@@ -48,7 +39,6 @@ const s3Creds: S3ClientConfig = {
     // SERVICES
     FaceIdService,
     FlujoService,
-    StorageService,
     // REPOS
     FlujoRepo,
     FaceidRepo,
@@ -63,7 +53,16 @@ const s3Creds: S3ClientConfig = {
     {
       provide: ObjectStorageService,
       useFactory: async () => {
-        const client = S3Service.register({ config: s3Creds, domain: process.env.AWS_S3_BUCKET });
+        const client = S3Service.register({
+          config: {
+            credentials: {
+              accessKeyId: process.env.AWS_S3_ACCESSKEY,
+              secretAccessKey: process.env.AWS_S3_SECRETKEY,
+            },
+            region: process.env.AWS_S3_REGION,
+          },
+          domain: process.env.AWS_S3_BUCKET
+        });
         return new ObjectStorageService(client);
       }
     }

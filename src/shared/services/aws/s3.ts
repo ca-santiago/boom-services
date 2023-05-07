@@ -1,8 +1,6 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject } from "@nestjs/common";
 import { GetObjectCommand, PutObjectCommand, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-
-import { v4 } from 'uuid';
 
 export interface S3ServiceConfig {
     config: S3ClientConfig;
@@ -21,12 +19,12 @@ export interface S3ServiceUploadOptions {
     type?: string;
 }
 
-@Injectable()
 export class S3Service {
     constructor(@Inject('S3_SERVICE_CLIENT') private options: S3ServiceOptions) { }
 
     static register(options: S3ServiceConfig): S3Service {
         const client = new S3Client(options.config);
+        console.log(options)
         return new S3Service({ client, bucket: options.domain });
     }
 
