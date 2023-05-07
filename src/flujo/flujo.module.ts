@@ -18,6 +18,17 @@ import { SignatureSchema } from './repository/signature.schema';
 import { FaceIdService } from './services/faceId';
 import { FlujoService } from './services/flujo';
 import { StorageService } from './services/storage';
+import { ObjectStorageService } from 'src/shared/services/objectStorage';
+import { S3Service } from 'src/shared/services/aws';
+import { S3ClientConfig } from '@aws-sdk/client-s3';
+
+const s3Creds: S3ClientConfig = {
+  credentials: {
+    accessKeyId: process.env.AWS_S3_ACCESSKEY,
+    secretAccessKey: process.env.AWS_S3_SECRETKEY,
+  },
+  region: process.env.AWS_S3_REGION,
+};
 
 @Module({
   imports: [
@@ -48,7 +59,15 @@ import { StorageService } from './services/storage';
     FaceidMapper,
     SignatureMapper,
     PersonalInfoMapper,
+    // Storage
+    {
+      provide: ObjectStorageService,
+      useFactory: async () => {
+        const client = S3Service.register({ config: s3Creds, domain: process.env.AWS_S3_BUCKET });
+        return new ObjectStorageService(client);
+      }
+    }
   ],
   exports: [],
 })
-export class FlujoModule {}
+export class FlujoModule { }

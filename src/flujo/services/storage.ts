@@ -15,7 +15,7 @@ export class StorageService {
   async saveFile(data: Buffer, ext: string, name: string): Promise<string> {
     const sanitizedExt = ext[0] == '.' ? ext : `.${ext}`;
     const nameWithExtension = name + sanitizedExt;
-    fs.writeFileSync(path.join(baseDir, `public/${nameWithExtension}`), data);
+    fs.writeFileSync(path.join(baseDir, `files/${nameWithExtension}`), data);
     return nameWithExtension;
   }
 }

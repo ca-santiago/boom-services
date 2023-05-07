@@ -28,7 +28,7 @@ import createLocaltionHeaderString from '../helpers/createLocation';
 
 @Controller('flujos')
 export class FlujoController {
-  constructor(private flujoService: FlujoService) {}
+  constructor(private flujoService: FlujoService) { }
 
   @Get('/ping')
   ping() {
@@ -79,7 +79,7 @@ export class FlujoController {
             new BadRequestException('Only mp4/webm files are allowed'),
             false,
           );
-        if(ext === '.webm') {
+        if (ext === '.webm') {
           //TODO: Convert file to mp4
         }
 
