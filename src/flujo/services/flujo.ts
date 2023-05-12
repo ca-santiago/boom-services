@@ -11,7 +11,7 @@ import { FaceId } from '../domain/faceid';
 import { Flujo } from '../domain/flujo';
 import { PersonalInfo } from '../domain/personalinfo';
 import { Signature } from '../domain/signature';
-import { FlujoStatus, FlujoType as StepType } from '../interfaces/flujo';
+import { FlujoStatus, IFlujo, FlujoType as StepType } from '../interfaces/flujo';
 import { StepAccessTokenPayload } from '../interfaces/step.token';
 import { FaceidMapper } from '../mapper/faceid';
 import { PersonalInfoMapper } from '../mapper/personalinfo';
@@ -30,6 +30,10 @@ import {
 } from './dto';
 import { ObjectStorageService } from 'src/shared/services/objectStorage';
 
+interface CreateFlujoResponse {
+  id: string;
+}
+
 @Injectable()
 export class FlujoService {
   constructor(
@@ -46,23 +50,30 @@ export class FlujoService {
 
   async createFlujo(
     dto: CreateFlujoDTO,
-  ): Promise<{ token: string; id: string }> {
+  ): Promise<CreateFlujoResponse> {
     const newId = v4();
-    const instance = new Flujo(
-      newId,
-      dto.types,
-      moment().format(),
-      FlujoStatus.ACTIVE,
-    );
-    await this.flujoRepo.save(instance);
-    const payload: StepAccessTokenPayload = {
+
+    // Validate completion type structure
+
+
+    // Create instance
+    const newFlujo: IFlujo = {
       id: newId,
-    };
+      types: dto.types,
+      createdAt: moment().format(),
+      status: FlujoStatus.CREATED,
+      completionTime: dto.completionTime,
+      title: dto.title,
+      description: dto.description,
+    }
+
+    // Save instance
+    await this.flujoRepo.save(newFlujo);
+
+    const payload: StepAccessTokenPayload = { id: newId };
     const token: string = this.jwtService.sign(payload);
-    return {
-      token,
-      id: instance.id,
-    };
+
+    return { id: newFlujo.id };
   }
 
   async findById(id: string): Promise<Flujo | null> {

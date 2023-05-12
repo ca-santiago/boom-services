@@ -6,6 +6,7 @@ import {
   IsDateString,
   IsEmail,
   IsIn,
+  IsOptional,
   IsPhoneNumber,
   IsString,
 } from 'class-validator';
@@ -18,6 +19,16 @@ export class CreateFlujoDTO {
   @IsIn(Object.values(FlujoType), { each: true })
   @ArrayMaxSize(Object.entries(FlujoType).length)
   types: string[];
+
+  @IsString()
+  title: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsString()
+  completionTime: string;
 }
 
 export class CreateFaceidDTO {

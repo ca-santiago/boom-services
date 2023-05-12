@@ -2,10 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Flujo } from '../domain/flujo';
-import { FlujoPublicDTO } from '../interfaces/flujo.dto';
-import { FlujoRepoDTO } from '../interfaces/flujo.repo';
 import { FlujoMapper } from '../mapper/flujo';
 import { FlujoDocument } from './flujo.schema';
+import { FlujoPublicDTO, FlujoRepoDTO } from '../interfaces/flujo';
 
 @Injectable()
 export class FlujoRepo {

@@ -6,5 +6,8 @@ export class Flujo implements IFlujo {
     public types: string[],
     public createdAt: string,
     public status: string,
+    public completionTime: string,
+    public title: string,
+    public description?: string, 
   ) {}
 }

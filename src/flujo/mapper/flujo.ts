@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Flujo } from '../domain/flujo';
-import { FlujoPublicDTO } from '../interfaces/flujo.dto';
-import { FlujoRepoDTO } from '../interfaces/flujo.repo';
+import { IFlujo, FlujoPublicDTO, FlujoRepoDTO } from '../interfaces/flujo';
 
 @Injectable()
 export class FlujoMapper {
-  constructor() {}
+  constructor() { }
 
   toDomain(raw: FlujoRepoDTO): Flujo {
-    const instance = new Flujo(raw._id, raw.types, raw.createdAt, raw.status);
+    const { _id, ...rest } = raw;
+    const instance: IFlujo = {
+      id: raw._id,
+      ...rest,
+    }
     return instance;
   }
 
