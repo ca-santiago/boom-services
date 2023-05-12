@@ -31,7 +31,7 @@ export class FlujoRepo {
   }
 
   async findById(id: string): Promise<Flujo | null> {
-    const exist = await this.flujoModel.findById(id).exec();
+    const exist = await this.flujoModel.findById(id).lean().exec();
     return exist ? this.flujoMapper.toDomain(exist as FlujoRepoDTO) : null;
   }
 
@@ -43,6 +43,7 @@ export class FlujoRepo {
   async findAll(offset: number): Promise<FlujoPublicDTO[]> {
     const results = await this.flujoModel
       .find()
+      .lean()
       .limit(20)
       .skip(offset * 20)
       .sort([['createdAt', -1]])
