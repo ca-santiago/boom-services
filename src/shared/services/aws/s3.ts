@@ -24,7 +24,6 @@ export class S3Service {
 
     static register(options: S3ServiceConfig): S3Service {
         const client = new S3Client(options.config);
-        console.log(options)
         return new S3Service({ client, bucket: options.domain });
     }
 
