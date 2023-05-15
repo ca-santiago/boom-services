@@ -8,4 +8,7 @@ export const FlujoSchema = new Schema({
   createdAt: String,
   status: String,
   types: [String],
+  title: String,
+  description: String,
+  completionTime: String
 });
