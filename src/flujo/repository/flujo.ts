@@ -21,6 +21,7 @@ export class FlujoRepo {
     const mapped = this.flujoMapper.toRepo(domain);
     await this.flujoModel
       .findByIdAndUpdate(domain.id, mapped, { upsert: true })
+      .lean()
       .exec();
     return;
   }

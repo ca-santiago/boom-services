@@ -44,10 +44,10 @@ export class FlujoController {
     const servicePayload = await this.flujoService.createFlujo(dto);
     const resourceLocaltion = createLocaltionHeaderString(
       req,
-      servicePayload.id,
+      servicePayload.data.id,
       process.env.PORT,
     );
-    res.location(resourceLocaltion);
+    // res.location(resourceLocaltion);
     res.status(201).json(servicePayload).end();
   }
 

@@ -31,7 +31,7 @@ import {
 import { ObjectStorageService } from 'src/shared/services/objectStorage';
 
 interface CreateFlujoResponse {
-  id: string;
+  data: Flujo;
 }
 
 @Injectable()
@@ -73,7 +73,7 @@ export class FlujoService {
     const payload: StepAccessTokenPayload = { id: newId };
     const token: string = this.jwtService.sign(payload);
 
-    return { id: newFlujo.id };
+    return { data: newFlujo };
   }
 
   async findById(id: string): Promise<Flujo | null> {
