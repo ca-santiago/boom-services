@@ -9,6 +9,7 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsString,
+  Matches
 } from 'class-validator';
 import { FlujoType } from '../interfaces/flujo';
 
@@ -28,6 +29,7 @@ export class CreateFlujoDTO {
   description?: string;
 
   @IsString()
+  @Matches(/^\d+[hm]$/)
   completionTime: string;
 }
 
