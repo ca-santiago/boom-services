@@ -122,10 +122,11 @@ export class FlujoService {
 
     if (isStarted) {
       const payload: StepAccessTokenPayload = { id: existOrNull.id };
-      const token: string = this.jwtService.sign(payload, { expiresIn: this.calculateSecondsLeft(startTime, deadline) });
+      const token: string = this.jwtService.sign(payload, { expiresIn: secondsLeft });
       // Return
       return {
         token,
+        secondsLeft,
         flujo: existOrNull,
       };
     }
@@ -134,7 +135,7 @@ export class FlujoService {
     if (status === FlujoStatus.CREATED) {
       // Generate token
       const payload: StepAccessTokenPayload = { id: existOrNull.id };
-      const token: string = this.jwtService.sign(payload, { expiresIn: this.calculateSecondsLeft(startTime, deadline) });
+      const token: string = this.jwtService.sign(payload, { expiresIn: secondsLeft }); 
 
       // Update and save
       const updated: Flujo = {
@@ -147,6 +148,7 @@ export class FlujoService {
       // Return
       return {
         token,
+        secondsLeft,
         flujo: updated,
       };
     }
