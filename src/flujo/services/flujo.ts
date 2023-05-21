@@ -88,9 +88,6 @@ export class FlujoService {
   private calculateSecondsLeft(currentTime: number, deadline: number) {
     // Calculate the difference between the deadline and current time in milliseconds
     const timeDiff = deadline - currentTime;
-    console.log({
-      timeDiff
-    })
 
     // Check if the deadline has already passed
     if (timeDiff <= 0) {
@@ -112,12 +109,6 @@ export class FlujoService {
     const isStarted = status === FlujoStatus.STARTED;
     const deadline = this.sumCompletionTime(startTime || Date.now(), completionTime);
     const secondsLeft = this.calculateSecondsLeft(Date.now(), deadline);
-
-    console.log({
-      secondsLeft,
-      deadline,
-      startTime
-    })
 
     if (isStarted && secondsLeft < 1) {
       // Save locked and return
