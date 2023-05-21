@@ -5,10 +5,11 @@ export type FlujoDocument = IFlujo & Document;
 
 export const FlujoSchema = new Schema({
   _id: String,
-  createdAt: String,
+  createdAt: Number,
   status: String,
   types: [String],
   title: String,
   description: String,
-  completionTime: String
+  completionTime: String,
+  startTime: Number,
 });

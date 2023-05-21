@@ -9,6 +9,6 @@ export class PersonalInfo implements IPersonalinfo {
     public phoneNumber: string,
     public emial: string,
     public flujoId: string,
-    public createdAt: string,
+    public createdAt: number,
   ) {}
 }

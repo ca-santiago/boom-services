@@ -1,6 +1,6 @@
 export interface FaceidRepoDTO {
   _id: string;
   uri: string;
-  createdAt: string;
+  createdAt: number;
   flujoId: string;
 }

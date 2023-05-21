@@ -6,5 +6,5 @@ export interface IPersonalinfoPublicDTO {
   phoneNumber: string;
   emial: string;
   flujoId: string;
-  createdAt: string;
+  createdAt: number;
 }

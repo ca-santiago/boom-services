@@ -1,6 +1,6 @@
 export interface IFaceId {
   id: string;
   uriIdentifier: string;
-  createdAt: string;
+  createdAt: number;
   flujoId: string;
 }

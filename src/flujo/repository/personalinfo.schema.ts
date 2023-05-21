@@ -11,5 +11,5 @@ export const PersonalinfoSchema = new Schema({
   phoneNumber: String,
   emial: String,
   flujoId: String,
-  createdAt: String,
+  createdAt: Number,
 });

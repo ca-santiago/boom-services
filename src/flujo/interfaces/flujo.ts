@@ -1,20 +1,20 @@
 export interface IFlujo {
   id: string;
   types: string[];
-  createdAt: string;
+  createdAt: number;
   status: string;
   title: string;
   completionTime: string;
   description?: string;
+  startTime?: number;
 }
 
 export enum FlujoStatus {
   'CREATED' = 'CREATED',
   'STARTED' = 'STARTED',
   'FINISHED' = 'FINISHED',
-  'UNCOMPLETED' = 'UNCOMPLETED',
-
-  'ACTIVE' = 'ACTIVE',
+  // If times end and steps are uncompleted
+  'LOCKED' = 'LOCKED',
 }
 
 export enum FlujoType {

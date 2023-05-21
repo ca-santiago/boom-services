@@ -19,6 +19,7 @@ import { FaceIdService } from './services/faceId';
 import { FlujoService } from './services/flujo';
 import { ObjectStorageService } from 'src/shared/services/objectStorage';
 import { S3Service } from 'src/shared/services/aws';
+import { CompletionController } from './controllers/completion';
 
 
 @Module({
@@ -34,7 +35,7 @@ import { S3Service } from 'src/shared/services/aws';
       signOptions: { expiresIn: '5m' },
     }),
   ],
-  controllers: [FlujoController, FaceidController],
+  controllers: [FlujoController, FaceidController, CompletionController],
   providers: [
     // SERVICES
     FaceIdService,

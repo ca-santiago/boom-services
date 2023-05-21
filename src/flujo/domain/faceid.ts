@@ -4,7 +4,7 @@ export class FaceId implements IFaceId {
   constructor(
     public id: string,
     public uriIdentifier: string,
-    public createdAt: string,
+    public createdAt: number,
     public flujoId: string,
   ) {}
 }

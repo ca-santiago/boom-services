@@ -6,6 +6,6 @@ export type SignatureDocument = Document & ISignatureRepoDTO;
 export const SignatureSchema = new Schema({
   _id: String,
   uri: String,
-  createdAt: String,
+  createdAt: Number,
   flujoId: String,
 });
