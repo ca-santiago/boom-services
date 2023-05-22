@@ -107,7 +107,8 @@ export class FlujoService {
 
     // Verify againt started status
     const isStarted = status === FlujoStatus.STARTED;
-    const deadline = this.sumCompletionTime(startTime || Date.now(), completionTime);
+    const _startTime = startTime || Date.now();
+    const deadline = this.sumCompletionTime(_startTime, completionTime);
     const secondsLeft = this.calculateSecondsLeft(Date.now(), deadline);
 
     if (isStarted && secondsLeft < 1) {
@@ -135,7 +136,8 @@ export class FlujoService {
     if (status === FlujoStatus.CREATED) {
       // Generate token
       const payload: StepAccessTokenPayload = { id: existOrNull.id };
-      const token: string = this.jwtService.sign(payload, { expiresIn: secondsLeft }); 
+      const updatedSecondsLeft = this.calculateSecondsLeft(_startTime, deadline);
+      const token: string = this.jwtService.sign(payload, { expiresIn: updatedSecondsLeft });
 
       // Update and save
       const updated: Flujo = {
@@ -148,7 +150,7 @@ export class FlujoService {
       // Return
       return {
         token,
-        secondsLeft,
+        secondsLeft: updatedSecondsLeft,
         flujo: updated,
       };
     }
