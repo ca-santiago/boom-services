@@ -10,7 +10,7 @@ import { FaceId } from '../domain/faceid';
 import { Flujo } from '../domain/flujo';
 import { PersonalInfo } from '../domain/personalinfo';
 import { Signature } from '../domain/signature';
-import { FlujoStatus, IFlujo, FlujoType as StepType } from '../interfaces/flujo';
+import { FlujoStatus, IFlujo, StepType as StepType } from '../interfaces/flujo';
 import { StepAccessTokenPayload } from '../interfaces/step.token';
 import { FaceidMapper } from '../mapper/faceid';
 import { PersonalInfoMapper } from '../mapper/personalinfo';
@@ -63,6 +63,7 @@ export class FlujoService {
       completionTime: dto.completionTime,
       title: dto.title,
       description: dto.description,
+      completedSteps: []
     }
 
     // Save instance
@@ -206,6 +207,15 @@ export class FlujoService {
     }
   }
 
+  private maskStepAsCompleted(f: Flujo, step: StepType): Flujo {
+    const cleanedSteps = new Set([...f.completedSteps, step]);
+    const updated: Flujo = {
+      ...f,
+      completedSteps: Array.from(cleanedSteps)
+    }
+    return updated;
+  }
+
   async putFaceId(dto: PutFaceidDTO) {
     const tokenPayload = this.verifyStepAccesToken(dto.accessToken);
     if (tokenPayload === null) throw new UnauthorizedException();
@@ -214,7 +224,7 @@ export class FlujoService {
     if (tokenPayload.id !== dto.flujoId) throw new UnauthorizedException();
 
     // Verify if given flujo exist and step type is available
-    await this.findFlujoAndVerifyType(dto.flujoId, StepType.FACE);
+    const flujo = await this.findFlujoAndVerifyType(dto.flujoId, StepType.FACE);
 
     // Let's save the file
     // const fileURI = await this.storageService.saveFile(
@@ -241,6 +251,7 @@ export class FlujoService {
     );
 
     await this.faceidRepo.save(faceidInstance);
+    await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.FACE));
 
     return this.faceidMapper.toPublicDTO(faceidInstance);
   }
@@ -255,7 +266,7 @@ export class FlujoService {
     // Trying to edit a different resource.
     if (tokenPayload.id !== dto.flujoId) throw new UnauthorizedException();
 
-    await this.findFlujoAndVerifyType(dto.flujoId, StepType.PERSONAL_DATA);
+    const flujo = await this.findFlujoAndVerifyType(dto.flujoId, StepType.PERSONAL_DATA);
 
     const pInfoOrNull = await this.personalInfoRepo.findByFlujoId(dto.flujoId);
 
@@ -271,6 +282,7 @@ export class FlujoService {
     );
 
     await this.personalInfoRepo.save(pInfoInstance);
+    await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.PERSONAL_DATA));
     return this.personalInfoMapper.toPublicDTO(pInfoInstance);
   } // PutPersonalData
 
@@ -285,7 +297,7 @@ export class FlujoService {
     // Trying to edit a different resource.
     if (tokenPayload.id !== dto.flujoId) throw new UnauthorizedException();
 
-    await this.findFlujoAndVerifyType(dto.flujoId, StepType.SIGNATURE);
+    const flujo = await this.findFlujoAndVerifyType(dto.flujoId, StepType.SIGNATURE);
 
     // Let's save the file
     // const fileURI = await this.storageService.saveFile(
@@ -311,6 +323,7 @@ export class FlujoService {
     );
 
     await this.signatureRepo.save(signatureInstance);
+    await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.SIGNATURE));
 
     return this.signatureMapper.toPublicDTO(signatureInstance);
   }

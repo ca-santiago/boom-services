@@ -7,6 +7,7 @@ export interface IFlujo {
   completionTime: string;
   description?: string;
   startTime?: number;
+  completedSteps: string[];
 }
 
 export enum FlujoStatus {
@@ -17,7 +18,7 @@ export enum FlujoStatus {
   'LOCKED' = 'LOCKED',
 }
 
-export enum FlujoType {
+export enum StepType {
   'FACE' = 'FACE',
   'PERSONAL_DATA' = 'PERSONAL_DATA',
   'SIGNATURE' = 'SIGNATURE',

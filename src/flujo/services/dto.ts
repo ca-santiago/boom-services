@@ -11,14 +11,14 @@ import {
   IsString,
   Matches
 } from 'class-validator';
-import { FlujoType } from '../interfaces/flujo';
+import { StepType } from '../interfaces/flujo';
 
 export class CreateFlujoDTO {
   @IsArray()
   @ArrayMinSize(1)
   @ArrayUnique()
-  @IsIn(Object.values(FlujoType), { each: true })
-  @ArrayMaxSize(Object.entries(FlujoType).length)
+  @IsIn(Object.values(StepType), { each: true })
+  @ArrayMaxSize(Object.entries(StepType).length)
   types: string[];
 
   @IsString()
