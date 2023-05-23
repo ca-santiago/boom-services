@@ -12,4 +12,5 @@ export const FlujoSchema = new Schema<FlujoDocument>({
   description: String,
   completionTime: String,
   startTime: Number,
+  completedSteps: [String],
 });
