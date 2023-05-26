@@ -66,14 +66,14 @@ export class FlujoController {
     FileInterceptor('file', {
       limits: { files: 1 },
       fileFilter: function (req, file, callback) {
-        let ext = path.extname(file.originalname);
-        req.ext = ext;
-        if (ext !== '.mp4' && ext !== '.webm')
+        let fileType = file.mimetype.split('/')[1];
+        req.ext = fileType;
+        if (fileType !== 'mp4' && fileType !== 'webm')
           return callback(
             new BadRequestException('Only mp4/webm files are allowed'),
             false,
           );
-        if (ext === '.webm') {
+        if (fileType === 'webm') {
           //TODO: Convert file to mp4
         }
 
