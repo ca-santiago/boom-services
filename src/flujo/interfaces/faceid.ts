@@ -1,6 +1,8 @@
+import { StepFile } from "./common";
+
 export interface IFaceId {
   id: string;
-  uriIdentifier: string;
   createdAt: number;
   flujoId: string;
+  file: StepFile;
 }

@@ -5,16 +5,19 @@ import { FaceidRepoDTO } from '../interfaces/faceid.repo';
 
 @Injectable()
 export class FaceidMapper {
-  constructor() {}
+  constructor() { }
 
   toDomain(raw: FaceidRepoDTO): FaceId {
-    return new FaceId(raw._id, raw.uri, raw.createdAt, raw.flujoId);
+    const { _id, ...rest } = raw;
+    return {
+      ...rest,
+      id: raw._id
+    };
   }
 
   toRepo(domain: FaceId): FaceidRepoDTO {
     const out: FaceidRepoDTO = {
       _id: domain.id,
-      uri: domain.uriIdentifier,
       ...domain,
     };
     return out;

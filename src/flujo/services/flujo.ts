@@ -28,8 +28,7 @@ import {
   PutSignatureDTO,
 } from './dto';
 import { ObjectStorageService } from 'src/shared/services/objectStorage';
-import * as moment from 'moment';
-import { start } from 'repl';
+import { StepFileStatus } from '../interfaces/common';
 
 interface CreateFlujoResponse {
   data: Flujo;
@@ -69,98 +68,6 @@ export class FlujoService {
     // Save instance
     await this.flujoRepo.save(newFlujo);
     return { data: newFlujo };
-  }
-
-  private sumCompletionTime(dateInMillis: number, timeString: string) {
-    const value = parseInt(timeString);
-    const unit = timeString.slice(-1);
-
-    const date = new Date(dateInMillis);
-
-    if (unit === 'h') {
-      date.setHours(date.getHours() + value);
-    } else if (unit === 'm') {
-      date.setMinutes(date.getMinutes() + value);
-    }
-
-    return date.getTime();
-  }
-
-  private calculateSecondsLeft(currentTime: number, deadline: number) {
-    // Calculate the difference between the deadline and current time in milliseconds
-    const timeDiff = deadline - currentTime;
-
-    // Check if the deadline has already passed
-    if (timeDiff <= 0) {
-      return 0; // Return 0 seconds if the deadline has passed
-    }
-
-    // Convert milliseconds to seconds
-    const secondsLeft = Math.floor(timeDiff / 1000);
-
-    return secondsLeft;
-  }
-
-  async startFlujo(id: string) {
-    const existOrNull = await this.flujoRepo.findById(id);
-    if (!existOrNull) throw new UnauthorizedException();
-    const { status, completionTime, startTime } = existOrNull;
-
-    // Verify againt started status
-    const isStarted = status === FlujoStatus.STARTED;
-    const _startTime = startTime || Date.now();
-    const deadline = this.sumCompletionTime(_startTime, completionTime);
-    const secondsLeft = this.calculateSecondsLeft(Date.now(), deadline);
-
-    if (isStarted && secondsLeft < 1) {
-      // Save locked and return
-      const updated: Flujo = {
-        ...existOrNull,
-        status: FlujoStatus.LOCKED,
-      }
-      await this.flujoRepo.save(updated);
-      throw new UnauthorizedException();
-    }
-
-    if (isStarted) {
-      const payload: StepAccessTokenPayload = { id: existOrNull.id };
-      const token: string = this.jwtService.sign(payload, { expiresIn: secondsLeft });
-      // Return
-      return {
-        token,
-        secondsLeft,
-        flujo: existOrNull,
-      };
-    }
-
-    // If is just created, lets start it
-    if (status === FlujoStatus.CREATED) {
-      // Generate token
-      const payload: StepAccessTokenPayload = { id: existOrNull.id };
-      const updatedSecondsLeft = this.calculateSecondsLeft(_startTime, deadline);
-      const token: string = this.jwtService.sign(payload, { expiresIn: updatedSecondsLeft });
-
-      // Update and save
-      const updated: Flujo = {
-        ...existOrNull,
-        status: FlujoStatus.STARTED,
-        startTime: Date.now(),
-      }
-      await this.flujoRepo.save(updated);
-
-      // Return
-      return {
-        token,
-        secondsLeft: updatedSecondsLeft,
-        flujo: updated,
-      };
-    }
-
-    if (status === FlujoStatus.LOCKED || status === FlujoStatus.FINISHED) {
-      throw new UnauthorizedException();
-    }
-
-    throw new UnauthorizedException('Invalid status');
   }
 
   async findById(id: string): Promise<Flujo | null> {
@@ -243,12 +150,16 @@ export class FlujoService {
 
     // Let's create the faceid step instance
     // if already exist one for the current flujo, use it's id.
-    const faceidInstance = new FaceId(
+    const faceidInstance: FaceId = {
       id,
-      id,
-      Date.now(),
-      dto.flujoId,
-    );
+      file: {
+        fileId: '',
+        id: '',
+        status: StepFileStatus.WAITING
+      },
+      createdAt: Date.now(),
+      flujoId: dto.flujoId,
+    }
 
     await this.faceidRepo.save(faceidInstance);
     await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.FACE));

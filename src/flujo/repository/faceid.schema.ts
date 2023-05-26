@@ -5,7 +5,9 @@ export type FaceidDocument = Document & FaceidRepoDTO;
 
 export const FaceidSchema = new Schema({
   _id: String,
-  uri: String,
   createdAt: Number,
   flujoId: String,
+  file: {
+    
+  }
 });

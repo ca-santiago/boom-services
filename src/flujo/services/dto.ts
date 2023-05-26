@@ -49,6 +49,13 @@ export class PutFaceidDTO {
   ext: string;
 }
 
+export class PutFaceidDTOV2 {
+  @IsString()
+  token: string;
+
+  flujoId: string;
+}
+
 export class PutPersonalDataDTO {
   @IsString()
   accessToken: string;

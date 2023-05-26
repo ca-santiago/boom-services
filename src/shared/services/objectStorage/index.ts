@@ -5,7 +5,7 @@ import { S3Service } from '../aws';
 export class ObjectStorageService {
   constructor(@Inject('S3Service') private s3Client: S3Service) { }
 
-  async getSignedUrl(name: string, fileMd5: string): Promise<string> {
+  async getSignedUrl(name: string) {
     return this.s3Client.getSignedUrl(name);
   }
 
