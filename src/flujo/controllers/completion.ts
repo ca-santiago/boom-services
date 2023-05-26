@@ -1,7 +1,7 @@
 import { Body, Controller, InternalServerErrorException, Param, Post, Put } from "@nestjs/common";
 import { FlujoService } from "../services/flujo";
 import { CompletionService } from "../services/completion";
-import { PutFaceidDTOV2 } from "../services/dto";
+import { PutFaceidDTOV2, PutPersonalDataDTO, PutContactInfoDTO } from "../services/dto";
 
 @Controller('completion')
 export class CompletionController {
@@ -32,6 +32,16 @@ export class CompletionController {
                 ...dto,
                 flujoId
             });
+        } catch (err) {
+            console.log(err);
+            throw new InternalServerErrorException();
+        }
+    }
+
+    @Put(':id/contactInfo')
+    async putContactInfo(@Body() dto: PutContactInfoDTO, @Param('id') id) {
+        try {
+            return await this.completionService.putContactInfo({ ...dto, flujoId: id });
         } catch (err) {
             console.log(err);
             throw new InternalServerErrorException();

@@ -1,10 +1,10 @@
-export interface IPersonalinfoPublicDTO {
+export interface IContactInfoPublicDTO {
   id: string;
   fullName: string;
   birthDate: string;
   bornPlace: string;
   phoneNumber: string;
-  emial: string;
+  email: string;
   flujoId: string;
   createdAt: number;
 }

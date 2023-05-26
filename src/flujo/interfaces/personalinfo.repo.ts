@@ -1,10 +1,10 @@
-export interface IPersonalinfoRepoDTO {
+export interface IContactInfoRepoDTO {
   _id: string;
   fullName: string;
   birthDate: string;
   bornPlace: string;
   phoneNumber: string;
-  emial: string;
+  email: string;
   flujoId: string;
   createdAt: number;
 }

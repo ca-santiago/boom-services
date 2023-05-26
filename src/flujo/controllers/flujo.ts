@@ -23,7 +23,6 @@ import {
 import { FlujoService } from '../services/flujo';
 import * as path from 'path';
 import { Request, Response } from 'express';
-import createLocaltionHeaderString from '../helpers/createLocation';
 
 
 @Controller('flujos')

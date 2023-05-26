@@ -8,16 +8,16 @@ import { JwtService } from '@nestjs/jwt';
 import { v4 } from 'uuid';
 import { FaceId } from '../domain/faceid';
 import { Flujo } from '../domain/flujo';
-import { PersonalInfo } from '../domain/personalinfo';
+import { ContactInfo } from '../domain/contactInfo';
 import { Signature } from '../domain/signature';
 import { FlujoStatus, IFlujo, StepType as StepType } from '../interfaces/flujo';
 import { StepAccessTokenPayload } from '../interfaces/step.token';
 import { FaceidMapper } from '../mapper/faceid';
-import { PersonalInfoMapper } from '../mapper/personalinfo';
+import { ContactInfoMapper } from '../mapper/contactInfo';
 import { SignatureMapper } from '../mapper/signature';
 import { FaceidRepo } from '../repository/faceid';
 import { FlujoRepo } from '../repository/flujo';
-import { PersonalinfoRepo } from '../repository/personalinfo';
+import { ContactInfoRepo } from '../repository/contactInfo';
 import { SignatureRepo } from '../repository/signature';
 
 // DTOs
@@ -43,8 +43,8 @@ export class FlujoService {
     private faceidMapper: FaceidMapper,
     private signatureRepo: SignatureRepo,
     private signatureMapper: SignatureMapper,
-    private personalInfoRepo: PersonalinfoRepo,
-    private personalInfoMapper: PersonalInfoMapper,
+    private personalInfoRepo: ContactInfoRepo,
+    private personalInfoMapper: ContactInfoMapper,
     private fileStorageService: ObjectStorageService,
   ) { }
 
@@ -181,7 +181,7 @@ export class FlujoService {
 
     const pInfoOrNull = await this.personalInfoRepo.findByFlujoId(dto.flujoId);
 
-    const pInfoInstance = new PersonalInfo(
+    const pInfoInstance = new ContactInfo(
       pInfoOrNull ? pInfoOrNull.id : v4(),
       dto.fullName,
       dto.birthDate,

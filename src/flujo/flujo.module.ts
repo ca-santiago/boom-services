@@ -5,14 +5,14 @@ import { FaceidController } from './controllers/faceid';
 import { FlujoController } from './controllers/flujo';
 import { FaceidMapper } from './mapper/faceid';
 import { FlujoMapper } from './mapper/flujo';
-import { PersonalInfoMapper } from './mapper/personalinfo';
+import { ContactInfoMapper } from './mapper/contactInfo';
 import { SignatureMapper } from './mapper/signature';
 import { FaceidRepo } from './repository/faceid';
 import { FaceidSchema } from './repository/faceid.schema';
 import { FlujoRepo } from './repository/flujo';
 import { FlujoSchema } from './repository/flujo.schema';
-import { PersonalinfoRepo } from './repository/personalinfo';
-import { PersonalinfoSchema } from './repository/personalinfo.schema';
+import { ContactInfoRepo } from './repository/contactInfo';
+import { ContactInfoSchema } from './repository/contactInfo.schema';
 import { SignatureRepo } from './repository/signature';
 import { SignatureSchema } from './repository/signature.schema';
 import { FaceIdService } from './services/faceId';
@@ -29,7 +29,7 @@ import { CompletionService } from './services/completion';
       { name: 'Flujo', schema: FlujoSchema },
       { name: 'Faceid', schema: FaceidSchema },
       { name: 'Signature', schema: SignatureSchema },
-      { name: 'Personalinfo', schema: PersonalinfoSchema },
+      { name: 'ContactInfo', schema: ContactInfoSchema },
     ]),
     JwtModule.register({
       secret: 'flujo-token-secret-key',
@@ -46,12 +46,12 @@ import { CompletionService } from './services/completion';
     FlujoRepo,
     FaceidRepo,
     SignatureRepo,
-    PersonalinfoRepo,
+    ContactInfoRepo,
     // MAPPERS
     FlujoMapper,
     FaceidMapper,
     SignatureMapper,
-    PersonalInfoMapper,
+    ContactInfoMapper,
     // Storage
     {
       provide: ObjectStorageService,

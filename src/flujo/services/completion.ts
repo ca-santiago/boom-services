@@ -6,11 +6,13 @@ import { FaceId } from "../domain/faceid";
 import { Flujo } from "../domain/flujo";
 import { JwtService } from "@nestjs/jwt";
 import { StepAccessTokenPayload } from "../interfaces/step.token";
-import { PutFaceidDTOV2 } from "./dto";
+import { PutContactInfoDTO, PutFaceidDTOV2 } from "./dto";
 import { FlujoStatus, StepType } from "../interfaces/flujo";
 import { v4 } from 'uuid';
 import { StepFileStatus } from "../interfaces/common";
-import { FaceidMapper } from "../mapper/faceid";
+import { ContactInfoRepo } from "../repository/contactInfo";
+import { ContactInfoMapper } from "../mapper/contactInfo";
+import { ContactInfo } from "../domain/contactInfo";
 
 @Injectable()
 export class CompletionService {
@@ -19,7 +21,8 @@ export class CompletionService {
         private faceidRepo: FaceidRepo,
         private fileStorageService: ObjectStorageService,
         private jwtService: JwtService,
-        private faceidMapper: FaceidMapper,
+        private contactInfoRepo: ContactInfoRepo,
+        private contactInfoMapper: ContactInfoMapper,
     ) { }
 
     //  HELPERS // TODO: Move to helper provider
@@ -191,4 +194,28 @@ export class CompletionService {
             signedUrl
         };
     }
+
+    async putContactInfo(dto: PutContactInfoDTO) {
+        const tokenPayload = this.verifyStepAccesToken(dto.accessToken);
+        if (tokenPayload === null) throw new UnauthorizedException();
+
+        // Trying to edit a different resource.
+        if (tokenPayload.id !== dto.flujoId) throw new UnauthorizedException();
+
+        const flujo = await this.findFlujoAndVerifyType(dto.flujoId, StepType.PERSONAL_DATA);
+
+        const existOrNull = await this.contactInfoRepo.findByFlujoId(dto.flujoId);
+
+        const { accessToken, ...rest } = dto;
+        const instance: ContactInfo = {
+            ...rest,
+            phoneNumber: dto.phone,
+            createdAt: Date.now(),
+            id: existOrNull ? existOrNull.id : v4(),
+        };
+
+        await this.contactInfoRepo.save(instance);
+        await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.PERSONAL_DATA));
+        return this.contactInfoMapper.toPublicDTO(instance);
+    } 
 }

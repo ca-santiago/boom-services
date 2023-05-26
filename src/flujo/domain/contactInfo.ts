@@ -1,13 +1,13 @@
-import { IPersonalinfo } from '../interfaces/personalinfo';
+import { IContactInfo } from '../interfaces/personalinfo';
 
-export class PersonalInfo implements IPersonalinfo {
+export class ContactInfo implements IContactInfo {
   constructor(
     public id: string,
     public fullName: string,
     public birthDate: string,
     public bornPlace: string,
     public phoneNumber: string,
-    public emial: string,
+    public email: string,
     public flujoId: string,
     public createdAt: number,
   ) {}

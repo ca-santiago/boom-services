@@ -78,6 +78,28 @@ export class PutPersonalDataDTO {
   bornPlace: string;
 }
 
+export class PutContactInfoDTO {
+  @IsString()
+  accessToken: string;
+
+  flujoId: string;
+
+  @IsString()
+  fullName: string;
+
+  @IsDateString()
+  birthDate: string;
+
+  @IsPhoneNumber()
+  phone: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  bornPlace: string;
+}
+
 export class PutSignatureDTO {
 
   @IsString()
