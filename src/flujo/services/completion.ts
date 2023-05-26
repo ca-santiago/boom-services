@@ -6,23 +6,28 @@ import { FaceId } from "../domain/faceid";
 import { Flujo } from "../domain/flujo";
 import { JwtService } from "@nestjs/jwt";
 import { StepAccessTokenPayload } from "../interfaces/step.token";
-import { PutContactInfoDTO, PutFaceidDTOV2 } from "./dto";
+import { PutContactInfoDTO, PutFaceidDTOV2, PutSignatureDTO } from "./dto";
 import { FlujoStatus, StepType } from "../interfaces/flujo";
 import { v4 } from 'uuid';
 import { StepFileStatus } from "../interfaces/common";
 import { ContactInfoRepo } from "../repository/contactInfo";
 import { ContactInfoMapper } from "../mapper/contactInfo";
 import { ContactInfo } from "../domain/contactInfo";
+import { SignatureRepo } from "../repository/signature";
+import { SignatureMapper } from "../mapper/signature";
+import { Signature } from "../domain/signature";
 
 @Injectable()
 export class CompletionService {
     constructor(
         private flujoRepo: FlujoRepo,
         private faceidRepo: FaceidRepo,
-        private fileStorageService: ObjectStorageService,
         private jwtService: JwtService,
+        private signatureRepo: SignatureRepo,
+        private signatureMapper: SignatureMapper,
         private contactInfoRepo: ContactInfoRepo,
         private contactInfoMapper: ContactInfoMapper,
+        private fileStorageService: ObjectStorageService,
     ) { }
 
     //  HELPERS // TODO: Move to helper provider
@@ -217,5 +222,36 @@ export class CompletionService {
         await this.contactInfoRepo.save(instance);
         await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.PERSONAL_DATA));
         return this.contactInfoMapper.toPublicDTO(instance);
-    } 
+    }
+
+    async putSignature(dto: PutSignatureDTO) {
+        const tokenPayload = this.verifyStepAccesToken(dto.accessToken);
+        if (tokenPayload === null) throw new UnauthorizedException();
+
+        // Trying to edit a different resource.
+        if (tokenPayload.id !== dto.flujoId) throw new UnauthorizedException();
+
+        const flujo = await this.findFlujoAndVerifyType(dto.flujoId, StepType.SIGNATURE);
+
+        // Search for an already created faceid for using its id
+        const signatureOrNull = await this.faceidRepo.findByFlujoId(dto.flujoId);
+
+        const id = signatureOrNull ? signatureOrNull.id : v4();
+
+        await this.fileStorageService.uploadFile(dto.file.buffer, id, dto.file.mimetype);
+
+        // Let's create the faceid step instance
+        // if already exist one for the current flujo, use it's id.
+        const signatureInstance: Signature = {
+            id,
+            createdAt: Date.now(),
+            flujoId: dto.flujoId,
+            uri: id,
+        };
+
+        await this.signatureRepo.save(signatureInstance);
+        await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.SIGNATURE));
+
+        return this.signatureMapper.toPublicDTO(signatureInstance);
+    }
 }

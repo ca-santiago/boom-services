@@ -118,12 +118,9 @@ export class FlujoController {
     @Body() dto: PutSignatureDTO,
   ) {
     if (!file) throw new BadRequestException('Should provide file');
-    const splitName = file.originalname.split('.');
-    const extension = splitName[splitName.length - 1];
 
     await this.flujoService.putSignature({
       ...dto,
-      extension,
       file,
       flujoId: id,
     });

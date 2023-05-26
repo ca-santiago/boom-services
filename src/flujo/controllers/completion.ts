@@ -1,7 +1,8 @@
-import { Body, Controller, InternalServerErrorException, Param, Post, Put } from "@nestjs/common";
+import { BadRequestException, Body, Controller, InternalServerErrorException, Param, Post, Put, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { FlujoService } from "../services/flujo";
 import { CompletionService } from "../services/completion";
-import { PutFaceidDTOV2, PutPersonalDataDTO, PutContactInfoDTO } from "../services/dto";
+import { PutFaceidDTOV2, PutPersonalDataDTO, PutContactInfoDTO, PutSignatureDTO } from "../services/dto";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller('completion')
 export class CompletionController {
@@ -46,5 +47,36 @@ export class CompletionController {
             console.log(err);
             throw new InternalServerErrorException();
         }
+    }
+
+    @Put(':id/signature')
+    @UseInterceptors(
+        FileInterceptor('file', {
+            limits: { files: 1 },
+            fileFilter: function (req, file, callback) {
+                let ext = file.mimetype.split('/')[1];
+                if (ext !== 'jpg' && ext !== 'png')
+                    return callback(
+                        new BadRequestException('Only jpg and png files are allowed'),
+                        false,
+                    );
+
+                callback(null, true);
+            },
+        }),
+    )
+    async putSignature(
+        @UploadedFile() file: Express.Multer.File,
+        @Param('id') id,
+        @Body() dto: PutSignatureDTO,
+    ) {
+        if (!file) throw new BadRequestException('Should provide file');
+
+        await this.completionService.putSignature({
+            ...dto,
+            file,
+            flujoId: id,
+        });
+        return;
     }
 }

@@ -101,15 +101,10 @@ export class PutContactInfoDTO {
 }
 
 export class PutSignatureDTO {
-
   @IsString()
   accessToken: string;
 
-  @IsString()
   flujoId: string;
 
   file: Express.Multer.File;
-
-  @IsString()
-  extension: string;
 }
