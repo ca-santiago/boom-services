@@ -192,7 +192,8 @@ export class CompletionService {
 
         await this.faceidRepo.save(faceidInstance);
         // No longer marking this step as completed, since we need to validate a file was actually uploaded
-        // await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.FACE));
+        // TODO: Do not set as completed once new flujo step domain entity is ready
+        await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.FACE));
 
         return {
             flujoId: dto.flujoId,

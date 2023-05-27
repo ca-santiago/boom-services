@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, InternalServerErrorException, Param, Post, Put, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { FlujoService } from "../services/flujo";
 import { CompletionService } from "../services/completion";
-import { PutFaceidDTOV2, PutPersonalDataDTO, PutContactInfoDTO, PutSignatureDTO } from "../services/dto";
+import { PutFaceidDTOV2, PutContactInfoDTO, PutSignatureDTO } from "../services/dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller('completion')
