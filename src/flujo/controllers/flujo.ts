@@ -14,14 +14,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  CreateFlujoDTO,
-  PutFaceidDTO,
-  PutPersonalDataDTO,
-  PutSignatureDTO,
-} from '../services/dto';
+import { CreateFlujoDTO } from '../services/dto';
 import { FlujoService } from '../services/flujo';
-import * as path from 'path';
 import { Request, Response } from 'express';
 
 
@@ -58,78 +52,5 @@ export class FlujoController {
       throw new NotFoundException();
     }
     return result;
-  }
-
-  @Put(':id/steps/faceid')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      limits: { files: 1 },
-      fileFilter: function (req, file, callback) {
-        let fileType = file.mimetype.split('/')[1];
-        req.ext = fileType;
-        if (fileType !== 'mp4' && fileType !== 'webm')
-          return callback(
-            new BadRequestException('Only mp4/webm files are allowed'),
-            false,
-          );
-        if (fileType === 'webm') {
-          //TODO: Convert file to mp4
-        }
-
-        callback(null, true);
-      },
-    }),
-  )
-  async putFaceid(
-    @UploadedFile() file: Express.Multer.File,
-    @Param('id') id,
-    @Body() dto: PutFaceidDTO,
-    @Req() req
-  ) {
-    if (!file) throw new BadRequestException('Should provide file');
-    await this.flujoService.putFaceId({
-      ...dto,
-      file,
-      flujoId: id,
-      ext: req['ext'],
-    });
-    return;
-  }
-
-  @Put(':id/steps/signature')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      limits: { files: 1 },
-      fileFilter: function (req, file, callback) {
-        let ext = path.extname(file?.originalname);
-        if (ext !== '.jpg' && ext !== '.png')
-          return callback(
-            new BadRequestException('Only jpg and png files are allowed'),
-            false,
-          );
-
-        callback(null, true);
-      },
-    }),
-  )
-  async putSignature(
-    @UploadedFile() file: Express.Multer.File,
-    @Param('id') id,
-    @Body() dto: PutSignatureDTO,
-  ) {
-    if (!file) throw new BadRequestException('Should provide file');
-
-    await this.flujoService.putSignature({
-      ...dto,
-      file,
-      flujoId: id,
-    });
-    return;
-  }
-
-  @Put(':id/steps/info')
-  async putPersonalDate(@Body() dto: PutPersonalDataDTO, @Param('id') id) {
-    await this.flujoService.putPersonalData({ ...dto, flujoId: id });
-    return;
   }
 }
