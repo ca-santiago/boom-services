@@ -19,7 +19,7 @@ export class FaceidRepo {
   }
 
   async findByFlujoId(id: string): Promise<FaceId | null> {
-    const exist = await this.faceidModel.findById(id).exec();
+    const exist = await this.faceidModel.findOne({ flujoId: id }).exec();
     return exist ? this.faceidMapper.toDomain(exist as FaceidRepoDTO) : null;
   }
 
