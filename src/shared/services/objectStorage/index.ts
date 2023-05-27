@@ -12,4 +12,8 @@ export class ObjectStorageService {
   async uploadFile(rawData: Buffer, name: string, mimetype: string) {
     return await this.s3Client.upload({ name, rawData, type: mimetype });
   }
+
+  async getObjectUrl(id: string) {
+    return this.s3Client.get(id);
+  }
 }

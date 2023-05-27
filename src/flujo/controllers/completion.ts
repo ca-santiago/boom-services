@@ -55,9 +55,9 @@ export class CompletionController {
             limits: { files: 1 },
             fileFilter: function (req, file, callback) {
                 let ext = file.mimetype.split('/')[1];
-                if (ext !== 'jpg' && ext !== 'png')
+                if (ext !== 'jpg' && ext !== 'png' && ext !== 'jpeg')
                     return callback(
-                        new BadRequestException('Only jpg and png files are allowed'),
+                        new BadRequestException('Only next files types allowed: jpg, jpeg, png'),
                         false,
                     );
 

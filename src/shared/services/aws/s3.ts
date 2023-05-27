@@ -39,7 +39,7 @@ export class S3Service {
             Body: rawData,
             ContentType: type
         }));
-        return; 
+        return;
     }
 
     // WARNING: This method will require a lot of calls to s3 to get files all the time

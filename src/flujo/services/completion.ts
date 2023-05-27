@@ -158,7 +158,6 @@ export class CompletionService {
         throw new UnauthorizedException('Invalid status');
     }
 
-
     async putFaceId(dto: PutFaceidDTOV2) {
         const tokenPayload = this.verifyStepAccesToken(dto.token);
         if (tokenPayload === null) throw new UnauthorizedException();
