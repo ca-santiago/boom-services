@@ -171,7 +171,7 @@ export class CompletionService {
         // Search for an already created faceid for using its id
         const faceidOrNull = await this.faceidRepo.findByFlujoId(dto.flujoId);
 
-        const id = faceidOrNull ? faceidOrNull : v4();
+        const id = faceidOrNull ? faceidOrNull.id : v4();
 
         // Get a signed url for the given file
         const signedUrl = await this.fileStorageService.getSignedUrl(id);
