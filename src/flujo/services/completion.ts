@@ -171,6 +171,8 @@ export class CompletionService {
         // Search for an already created faceid for using its id
         const faceidOrNull = await this.faceidRepo.findByFlujoId(dto.flujoId);
 
+        console.log(faceidOrNull);
+
         const id = faceidOrNull ? faceidOrNull.id : v4();
 
         // Get a signed url for the given file
@@ -186,7 +188,7 @@ export class CompletionService {
                 status: StepFileStatus.WAITING,
             },
             createdAt: Date.now(),
-            flujoId: faceidOrNull.flujoId,
+            flujoId: dto.flujoId,
         };
 
         await this.faceidRepo.save(faceidInstance);
