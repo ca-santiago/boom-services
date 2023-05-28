@@ -186,7 +186,7 @@ export class CompletionService {
                 status: StepFileStatus.WAITING,
             },
             createdAt: Date.now(),
-            flujoId: dto.flujoId,
+            flujoId: faceidOrNull.flujoId,
         };
 
         await this.faceidRepo.save(faceidInstance);
@@ -234,7 +234,7 @@ export class CompletionService {
         const flujo = await this.findFlujoAndVerifyType(dto.flujoId, StepType.SIGNATURE);
 
         // Search for an already created faceid for using its id
-        const signatureOrNull = await this.faceidRepo.findByFlujoId(dto.flujoId);
+        const signatureOrNull = await this.signatureRepo.findByFlujoId(dto.flujoId);
 
         const id = signatureOrNull ? signatureOrNull.id : v4();
 
