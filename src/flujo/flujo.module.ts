@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
-import { FaceidController } from './controllers/faceid';
 import { FlujoController } from './controllers/flujo';
 import { FaceidMapper } from './mapper/faceid';
 import { FlujoMapper } from './mapper/flujo';
@@ -15,7 +14,6 @@ import { ContactInfoRepo } from './repository/contactInfo';
 import { ContactInfoSchema } from './repository/contactInfo.schema';
 import { SignatureRepo } from './repository/signature';
 import { SignatureSchema } from './repository/signature.schema';
-import { FaceIdService } from './services/faceId';
 import { FlujoService } from './services/flujo';
 import { ObjectStorageService } from 'src/shared/services/objectStorage';
 import { S3Service } from 'src/shared/services/aws';
@@ -36,10 +34,9 @@ import { CompletionService } from './services/completion';
       signOptions: { expiresIn: '5m' },
     }),
   ],
-  controllers: [FlujoController, FaceidController, CompletionController],
+  controllers: [FlujoController, CompletionController],
   providers: [
     // SERVICES
-    FaceIdService,
     FlujoService,
     CompletionService,
     // REPOS
