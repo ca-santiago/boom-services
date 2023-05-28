@@ -265,7 +265,7 @@ export class CompletionService {
         // Trying to edit a different resource.
         if (tokenPayload.id !== dto.flujoId) throw new UnauthorizedException();
 
-        const flujo = await this.findFlujoAndVerifyType(dto.flujoId, StepType.PERSONAL_DATA);
+        const flujo = await this.findFlujoAndVerifyType(dto.flujoId, StepType.CONTACT_INFO);
 
         const existOrNull = await this.contactInfoRepo.findByFlujoId(dto.flujoId);
 
@@ -278,7 +278,7 @@ export class CompletionService {
         };
 
         await this.contactInfoRepo.save(instance);
-        await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.PERSONAL_DATA));
+        await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.CONTACT_INFO));
         return this.contactInfoMapper.toPublicDTO(instance);
     }
 

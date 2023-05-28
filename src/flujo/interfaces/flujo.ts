@@ -20,7 +20,7 @@ export enum FlujoStatus {
 
 export enum StepType {
   'FACE' = 'FACE',
-  'PERSONAL_DATA' = 'PERSONAL_DATA',
+  'CONTACT_INFO' = 'CONTACT_INFO',
   'SIGNATURE' = 'SIGNATURE',
 }
 
