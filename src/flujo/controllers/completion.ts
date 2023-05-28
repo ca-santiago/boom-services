@@ -1,16 +1,16 @@
 import { BadRequestException, Body, Controller, InternalServerErrorException, Param, Post, Put, UploadedFile, UseInterceptors } from "@nestjs/common";
-import { FlujoService } from "../services/flujo";
 import { CompletionService } from "../services/completion";
-import { PutFaceidDTOV2, PutContactInfoDTO, PutSignatureDTO } from "../services/dto";
+import { PutFaceidDTO, PutContactInfoDTO, PutSignatureDTO } from "../services/dto";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { FinishFlujoProps } from "../services/completion.types";
 
 @Controller('completion')
 export class CompletionController {
     constructor(
-        private flujoService: FlujoService,
         private completionService: CompletionService
     ) { }
 
+    // TODO: Fix endpoint structure - :id/start
     @Post('start/:id')
     async start(
         @Param('id') id: string
@@ -23,10 +23,25 @@ export class CompletionController {
         }
     }
 
+    @Post(':id/finish')
+    async finish(
+        @Param('id') id: string,
+        @Body() dto: FinishFlujoProps
+    ) {
+        try {
+            return this.completionService.finishFlujo({
+                flujoId: id,
+                token: dto.token
+            });
+        } catch (err) {
+            throw err;
+        }
+    }
+
     @Put(':id/faceid')
     async putFaceId(
         @Param('id') flujoId: string,
-        @Body() dto: PutFaceidDTOV2
+        @Body() dto: PutFaceidDTO
     ) {
         try {
             return this.completionService.putFaceId({

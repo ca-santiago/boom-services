@@ -1,34 +1,11 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
-import { FaceId } from '../domain/faceid';
 import { Flujo } from '../domain/flujo';
-import { ContactInfo } from '../domain/contactInfo';
-import { Signature } from '../domain/signature';
-import { FlujoStatus, IFlujo, StepType as StepType } from '../interfaces/flujo';
-import { StepAccessTokenPayload } from '../interfaces/step.token';
-import { FaceidMapper } from '../mapper/faceid';
-import { ContactInfoMapper } from '../mapper/contactInfo';
-import { SignatureMapper } from '../mapper/signature';
-import { FaceidRepo } from '../repository/faceid';
+import { FlujoStatus, IFlujo } from '../interfaces/flujo';
 import { FlujoRepo } from '../repository/flujo';
-import { ContactInfoRepo } from '../repository/contactInfo';
-import { SignatureRepo } from '../repository/signature';
 
 // DTOs
-import {
-  CreateFlujoDTO,
-  PutFaceidDTO,
-  PutPersonalDataDTO,
-  PutSignatureDTO,
-} from './dto';
-import { ObjectStorageService } from 'src/shared/services/objectStorage';
-import { StepFileStatus } from '../interfaces/common';
+import { CreateFlujoDTO } from './dto';
 
 interface CreateFlujoResponse {
   data: Flujo;

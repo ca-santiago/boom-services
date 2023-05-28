@@ -6,7 +6,7 @@ import { FaceId } from "../domain/faceid";
 import { Flujo } from "../domain/flujo";
 import { JwtService } from "@nestjs/jwt";
 import { StepAccessTokenPayload } from "../interfaces/step.token";
-import { PutContactInfoDTO, PutFaceidDTOV2, PutSignatureDTO } from "./dto";
+import { PutContactInfoDTO, PutFaceidDTO, PutSignatureDTO } from "./dto";
 import { FlujoStatus, StepType } from "../interfaces/flujo";
 import { v4 } from 'uuid';
 import { StepFileStatus } from "../interfaces/common";
@@ -16,6 +16,7 @@ import { ContactInfo } from "../domain/contactInfo";
 import { SignatureRepo } from "../repository/signature";
 import { SignatureMapper } from "../mapper/signature";
 import { Signature } from "../domain/signature";
+import { FinishFlujoProps, FinishFlujoResult, FinishFlujoResultType } from "./completion.types";
 
 @Injectable()
 export class CompletionService {
@@ -158,7 +159,62 @@ export class CompletionService {
         throw new UnauthorizedException('Invalid status');
     }
 
-    async putFaceId(dto: PutFaceidDTOV2) {
+    async finishFlujo(dto: FinishFlujoProps): Promise<FinishFlujoResult> {
+        const existOrNull = await this.flujoRepo.findById(dto.flujoId);
+        if (!existOrNull) throw new UnauthorizedException();
+
+        const tokenPayload = this.verifyStepAccesToken(dto.token);
+        if (tokenPayload === null) throw new UnauthorizedException();
+
+        const { status, completionTime, startTime, types, completedSteps } = existOrNull;
+
+        // Not started
+        if (status === FlujoStatus.CREATED) {
+            return {
+                resultType: FinishFlujoResultType.NOT_STARTED,
+                flujo: null,
+            }
+        }
+
+        // Already closed
+        if (status === FlujoStatus.FINISHED || status === FlujoStatus.LOCKED) {
+            return {
+                flujo: null,
+                resultType: FinishFlujoResultType.ALREADY_CLOSED
+            };
+        }
+
+        // Not marked as close yet, but no time left.
+        const deadline = this.sumCompletionTime(startTime, completionTime);
+        const secondsLeft = this.calculateSecondsLeft(Date.now(), deadline);
+        if (secondsLeft <= 0) {
+            return {
+                resultType: FinishFlujoResultType.ERROR,
+                flujo: null
+            }
+        }
+
+        // Validate completion status
+        const allStepCompleted = types.every(step => completedSteps.includes(step));
+
+        // CANT_FINISH
+        if (!allStepCompleted) {
+            return {
+                resultType: FinishFlujoResultType.CANT_FINISH,
+                flujo: null,
+            }
+        }
+
+        const updated: Flujo = {
+            ...existOrNull,
+            status: FlujoStatus.FINISHED,
+        }
+        await this.flujoRepo.save(updated);
+
+        return { flujo: updated, resultType: FinishFlujoResultType.OK };
+    }
+
+    async putFaceId(dto: PutFaceidDTO) {
         const tokenPayload = this.verifyStepAccesToken(dto.token);
         if (tokenPayload === null) throw new UnauthorizedException();
 
