@@ -49,7 +49,6 @@ export class CompletionController {
                 flujoId
             });
         } catch (err) {
-            console.log(err);
             throw new InternalServerErrorException();
         }
     }
@@ -59,7 +58,6 @@ export class CompletionController {
         try {
             return await this.completionService.putContactInfo({ ...dto, flujoId: id });
         } catch (err) {
-            console.log(err);
             throw new InternalServerErrorException();
         }
     }
