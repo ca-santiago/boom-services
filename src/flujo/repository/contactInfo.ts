@@ -25,12 +25,12 @@ export class ContactInfoRepo {
   }
 
   async findById(id: string): Promise<ContactInfo | null> {
-    const result = await this.model.findById(id).exec();
+    const result = await this.model.findById(id).lean().exec();
     return result ? this.pInfoMapper.toDomain(result) : null;
   }
 
   async findByFlujoId(id: string): Promise<ContactInfo | null> {
-    const result = await this.model.findOne({ flujoId: id }).exec();
+    const result = await this.model.findOne({ flujoId: id }).lean().exec();
     return result ? this.pInfoMapper.toDomain(result) : null;
   }
 }

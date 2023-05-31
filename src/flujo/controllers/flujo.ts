@@ -17,11 +17,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateFlujoDTO } from '../services/dto';
 import { FlujoService } from '../services/flujo';
 import { Request, Response } from 'express';
+import { StepsService } from '../services/steps';
 
 
 @Controller('flujos')
 export class FlujoController {
-  constructor(private flujoService: FlujoService) { }
+  constructor(
+    private flujoService: FlujoService,
+    private stepsService: StepsService,
+    ) { }
 
   @Get('/ping')
   ping() {
@@ -52,5 +56,15 @@ export class FlujoController {
       throw new NotFoundException();
     }
     return result;
+  }
+
+  @Get(':id/steps/contactInfo')
+  async getContactInfo(
+    @Param('id') id: string
+  ) {
+    const res = await this.stepsService.getContactInfoByFlujoId(id);
+    return {
+      data: res
+    }
   }
 }
