@@ -27,7 +27,7 @@ export class S3Service {
         return new S3Service({ client, bucket: options.domain });
     }
 
-    async getSignedUrl(name: string) {
+    async putObjectWithSignedUrl(name: string) {
         return getSignedUrl(this.options.client, new PutObjectCommand({ Bucket: this.options.bucket, Key: name }))
     }
 
@@ -42,9 +42,7 @@ export class S3Service {
         return;
     }
 
-    // WARNING: This method will require a lot of calls to s3 to get files all the time
-    // Planing to move this to use cloudfront
-    async get(name: string) {
+    async getObjectWithSignedUrl(name: string) {
         return getSignedUrl(
             this.options.client,
             new GetObjectCommand({

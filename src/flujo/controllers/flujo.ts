@@ -25,7 +25,7 @@ export class FlujoController {
   constructor(
     private flujoService: FlujoService,
     private stepsService: StepsService,
-    ) { }
+  ) { }
 
   @Get('/ping')
   ping() {
@@ -66,5 +66,21 @@ export class FlujoController {
     return {
       data: res
     }
+  }
+
+  @Get(':id/steps/signature')
+  async getSignature(
+    @Param('id') id: string
+  ) {
+    const res = await this.stepsService.getSignatureByFlujoId(id);
+    return res;
+  }
+
+  @Get(':id/steps/faceid')
+  async getFaceId(
+    @Param('id') id: string
+  ) {
+    const res = await this.stepsService.getFaceIdByFlujoId(id);
+    return res;
   }
 }

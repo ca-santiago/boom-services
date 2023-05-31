@@ -230,7 +230,7 @@ export class CompletionService {
         const id = faceidOrNull ? faceidOrNull.id : v4();
 
         // Get a signed url for the given file
-        const signedUrl = await this.fileStorageService.getSignedUrl(id);
+        const signedUrl = await this.fileStorageService.putObjectWithSignedUrl(id);
 
         // Let's create the faceid step instance
         // if already exist one for the current flujo, use it's id.
