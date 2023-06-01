@@ -27,7 +27,7 @@ export class FlujoRepo {
   }
 
   async delete(_id: string): Promise<void> {
-    this.flujoModel.findOneAndDelete({ _id });
+    this.flujoModel.findOneAndDelete({ _id }).exec();
     return;
   }
 

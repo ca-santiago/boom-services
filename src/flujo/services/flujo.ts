@@ -39,6 +39,10 @@ export class FlujoService {
     return { data: newFlujo };
   }
 
+  async delete(id: string) {
+    return await this.flujoRepo.delete(id);
+  }
+
   async findById(id: string): Promise<Flujo | null> {
     return this.flujoRepo.findById(id);
   }

@@ -12,6 +12,7 @@ import {
   UploadedFile,
   UseInterceptors,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateFlujoDTO } from '../services/dto';
@@ -56,6 +57,14 @@ export class FlujoController {
       throw new NotFoundException();
     }
     return result;
+  }
+
+  @Delete(':id')
+  async deleteFlujo(
+    @Param('id') id: string,
+  ) {
+    await this.flujoService.delete(id);
+    return;
   }
 
   @Get(':id/steps/contactInfo')
