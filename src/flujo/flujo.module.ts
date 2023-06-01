@@ -20,6 +20,7 @@ import { S3Service } from 'src/shared/services/aws';
 import { CompletionController } from './controllers/completion';
 import { CompletionService } from './services/completion';
 import { StepsService } from './services/steps';
+import { FlujoHelpersService } from './services/flujoHelpers';
 
 
 @Module({
@@ -41,6 +42,7 @@ import { StepsService } from './services/steps';
     FlujoService,
     CompletionService,
     StepsService,
+    FlujoHelpersService,
     // REPOS
     FlujoRepo,
     FaceidRepo,

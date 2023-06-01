@@ -6,6 +6,7 @@ import { FlujoRepo } from '../repository/flujo';
 
 // DTOs
 import { CreateFlujoDTO } from './dto';
+import { FlujoHelpersService } from './flujoHelpers';
 
 interface CreateFlujoResponse {
   data: Flujo;
@@ -15,6 +16,7 @@ interface CreateFlujoResponse {
 export class FlujoService {
   constructor(
     private flujoRepo: FlujoRepo,
+    private flujoHelpers: FlujoHelpersService,
   ) { }
 
   async createFlujo(
@@ -44,7 +46,22 @@ export class FlujoService {
   }
 
   async findById(id: string): Promise<Flujo | null> {
-    return this.flujoRepo.findById(id);
+    const existsOrNull = await this.flujoRepo.findById(id);
+    if (existsOrNull?.status === FlujoStatus.STARTED) {
+      const deadline = this.flujoHelpers.sumCompletionTime(existsOrNull.startTime, existsOrNull.completionTime);
+      const timeLeft = this.flujoHelpers.calculateSecondsLeftFromDateToDate(Date.now(), deadline)
+
+      if (timeLeft <= 0) {
+        const updated: Flujo = {
+          ...existsOrNull,
+          status: FlujoStatus.LOCKED,
+        }
+        await this.flujoRepo.save(updated);
+        return { ...updated }
+      }
+    }
+
+    return existsOrNull;
   }
 
   async findAll(page = 0) {

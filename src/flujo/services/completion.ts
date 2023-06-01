@@ -17,6 +17,7 @@ import { SignatureRepo } from "../repository/signature";
 import { SignatureMapper } from "../mapper/signature";
 import { Signature } from "../domain/signature";
 import { FinishFlujoProps, FinishFlujoResult, FinishFlujoResultType } from "./completion.types";
+import { FlujoHelpersService } from "./flujoHelpers";
 
 @Injectable()
 export class CompletionService {
@@ -29,9 +30,10 @@ export class CompletionService {
         private contactInfoRepo: ContactInfoRepo,
         private contactInfoMapper: ContactInfoMapper,
         private fileStorageService: ObjectStorageService,
+        private flujoHelpers: FlujoHelpersService
     ) { }
 
-    //  HELPERS // TODO: Move to helper provider
+    //  HELPERS
 
     private async findFlujoAndVerifyType(id: string, type: string): Promise<Flujo> {
         const flujoOrNull = await this.flujoRepo.findById(id);
@@ -44,57 +46,6 @@ export class CompletionService {
         return flujoOrNull;
     }
 
-    private verifyStepAccesToken(token: string): null | StepAccessTokenPayload {
-        try {
-            const res = this.jwtService.verify(token);
-            if (res === null) return null;
-
-            return res;
-        } catch (err) {
-            return null;
-        }
-    }
-
-    private maskStepAsCompleted(f: Flujo, step: StepType): Flujo {
-        const cleanedSteps = new Set([...f.completedSteps, step]);
-        const updated: Flujo = {
-            ...f,
-            completedSteps: Array.from(cleanedSteps)
-        }
-        return updated;
-    }
-
-
-    private sumCompletionTime(dateInMillis: number, timeString: string) {
-        const value = parseInt(timeString);
-        const unit = timeString.slice(-1);
-
-        const date = new Date(dateInMillis);
-
-        if (unit === 'h') {
-            date.setHours(date.getHours() + value);
-        } else if (unit === 'm') {
-            date.setMinutes(date.getMinutes() + value);
-        }
-
-        return date.getTime();
-    }
-
-    private calculateSecondsLeft(currentTime: number, deadline: number) {
-        // Calculate the difference between the deadline and current time in milliseconds
-        const timeDiff = deadline - currentTime;
-
-        // Check if the deadline has already passed
-        if (timeDiff <= 0) {
-            return 0; // Return 0 seconds if the deadline has passed
-        }
-
-        // Convert milliseconds to seconds
-        const secondsLeft = Math.floor(timeDiff / 1000);
-
-        return secondsLeft;
-    }
-
     // ACTIONS
 
     async startFlujo(id: string) {
@@ -105,8 +56,8 @@ export class CompletionService {
         // Verify againt started status
         const isStarted = status === FlujoStatus.STARTED;
         const _startTime = startTime || Date.now();
-        const deadline = this.sumCompletionTime(_startTime, completionTime);
-        const secondsLeft = this.calculateSecondsLeft(Date.now(), deadline);
+        const deadline = this.flujoHelpers.sumCompletionTime(_startTime, completionTime);
+        const secondsLeft = this.flujoHelpers.calculateSecondsLeftFromDateToDate(Date.now(), deadline);
 
         if (isStarted && secondsLeft < 1) {
             // Save locked and return
@@ -133,7 +84,7 @@ export class CompletionService {
         if (status === FlujoStatus.CREATED) {
             // Generate token
             const payload: StepAccessTokenPayload = { id: existOrNull.id };
-            const updatedSecondsLeft = this.calculateSecondsLeft(_startTime, deadline);
+            const updatedSecondsLeft = this.flujoHelpers.calculateSecondsLeftFromDateToDate(_startTime, deadline);
             const token: string = this.jwtService.sign(payload, { expiresIn: updatedSecondsLeft });
 
             // Update and save
@@ -163,7 +114,7 @@ export class CompletionService {
         const existOrNull = await this.flujoRepo.findById(dto.flujoId);
         if (!existOrNull) throw new UnauthorizedException();
 
-        const tokenPayload = this.verifyStepAccesToken(dto.token);
+        const tokenPayload = this.flujoHelpers.verifyStepAccesToken(dto.token);
         if (tokenPayload === null) throw new UnauthorizedException();
 
         const { status, completionTime, startTime, types, completedSteps } = existOrNull;
@@ -185,8 +136,8 @@ export class CompletionService {
         }
 
         // Not marked as close yet, but no time left.
-        const deadline = this.sumCompletionTime(startTime, completionTime);
-        const secondsLeft = this.calculateSecondsLeft(Date.now(), deadline);
+        const deadline = this.flujoHelpers.sumCompletionTime(startTime, completionTime);
+        const secondsLeft = this.flujoHelpers.calculateSecondsLeftFromDateToDate(Date.now(), deadline);
         if (secondsLeft <= 0) {
             return {
                 resultType: FinishFlujoResultType.ERROR,
@@ -215,7 +166,7 @@ export class CompletionService {
     }
 
     async putFaceId(dto: PutFaceidDTO) {
-        const tokenPayload = this.verifyStepAccesToken(dto.token);
+        const tokenPayload = this.flujoHelpers.verifyStepAccesToken(dto.token);
         if (tokenPayload === null) throw new UnauthorizedException();
 
         // Trying to edit a different resource.
@@ -248,7 +199,7 @@ export class CompletionService {
         await this.faceidRepo.save(faceidInstance);
         // No longer marking this step as completed, since we need to validate a file was actually uploaded
         // TODO: Do not set as completed once new flujo step domain entity is ready
-        await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.FACE));
+        await this.flujoRepo.save(this.flujoHelpers.maskStepAsCompleted(flujo, StepType.FACE));
 
         return {
             flujoId: dto.flujoId,
@@ -257,7 +208,7 @@ export class CompletionService {
     }
 
     async putContactInfo(dto: PutContactInfoDTO) {
-        const tokenPayload = this.verifyStepAccesToken(dto.accessToken);
+        const tokenPayload = this.flujoHelpers.verifyStepAccesToken(dto.accessToken);
         if (tokenPayload === null) throw new UnauthorizedException();
 
         // Trying to edit a different resource.
@@ -276,12 +227,12 @@ export class CompletionService {
         };
 
         await this.contactInfoRepo.save(instance);
-        await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.CONTACT_INFO));
+        await this.flujoRepo.save(this.flujoHelpers.maskStepAsCompleted(flujo, StepType.CONTACT_INFO));
         return this.contactInfoMapper.toPublicDTO(instance);
     }
 
     async putSignature(dto: PutSignatureDTO) {
-        const tokenPayload = this.verifyStepAccesToken(dto.accessToken);
+        const tokenPayload = this.flujoHelpers.verifyStepAccesToken(dto.accessToken);
         if (tokenPayload === null) throw new UnauthorizedException();
 
         // Trying to edit a different resource.
@@ -306,7 +257,7 @@ export class CompletionService {
         };
 
         await this.signatureRepo.save(signatureInstance);
-        await this.flujoRepo.save(this.maskStepAsCompleted(flujo, StepType.SIGNATURE));
+        await this.flujoRepo.save(this.flujoHelpers.maskStepAsCompleted(flujo, StepType.SIGNATURE));
 
         return this.signatureMapper.toPublicDTO(signatureInstance);
     }
