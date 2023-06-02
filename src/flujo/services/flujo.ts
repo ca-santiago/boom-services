@@ -1,12 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 } from 'uuid';
 import { Flujo } from '../domain/flujo';
 import { FlujoStatus, IFlujo } from '../interfaces/flujo';
 import { FlujoRepo } from '../repository/flujo';
 
 // DTOs
-import { CreateFlujoDTO } from './dto';
+import { CreateFlujoDTO, UpdateFlujoDTO } from './dto';
 import { FlujoHelpersService } from './flujoHelpers';
+import { FlujoMapper } from '../mapper/flujo';
 
 interface CreateFlujoResponse {
   data: Flujo;
@@ -16,6 +17,7 @@ interface CreateFlujoResponse {
 export class FlujoService {
   constructor(
     private flujoRepo: FlujoRepo,
+    private flujoMapper: FlujoMapper,
     private flujoHelpers: FlujoHelpersService,
   ) { }
 
@@ -39,6 +41,21 @@ export class FlujoService {
     // Save instance
     await this.flujoRepo.save(newFlujo);
     return { data: newFlujo };
+  }
+
+  async updateFlujo(dto: UpdateFlujoDTO, id: string) {
+    const flujoOrNull = await this.flujoRepo.findById(id);
+
+    if (!flujoOrNull) throw new NotFoundException();
+    const newDesc = dto.description === "" ? undefined : dto.description;
+    const updated: Flujo = {
+      ...flujoOrNull,
+      title: dto.title,
+      description: newDesc,
+    };
+    await this.flujoRepo.save(updated);
+
+    return this.flujoMapper.toPublicDTO(updated);
   }
 
   async delete(id: string) {

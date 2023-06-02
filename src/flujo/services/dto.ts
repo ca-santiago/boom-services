@@ -33,6 +33,18 @@ export class CreateFlujoDTO {
   completionTime: string;
 }
 
+export class UpdateFlujoDTO {
+  @IsString()
+  title: string;
+
+  @IsString()
+  description: string;
+
+  // @IsString()
+  // @Matches(/^\d+[hm]$/)
+  // completionTime: string;
+}
+
 export class PutFaceidDTO {
   @IsString()
   token: string;

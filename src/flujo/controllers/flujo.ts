@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -9,13 +8,10 @@ import {
   Put,
   Req,
   Res,
-  UploadedFile,
-  UseInterceptors,
   Query,
   Delete,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateFlujoDTO } from '../services/dto';
+import { CreateFlujoDTO, UpdateFlujoDTO } from '../services/dto';
 import { FlujoService } from '../services/flujo';
 import { Request, Response } from 'express';
 import { StepsService } from '../services/steps';
@@ -65,6 +61,14 @@ export class FlujoController {
   ) {
     await this.flujoService.delete(id);
     return;
+  }
+
+  @Put(':id')
+  async updateFlujo(
+    @Param('id') id: string,
+    @Body() dto: UpdateFlujoDTO,
+  ) {
+    return await this.flujoService.updateFlujo(dto, id);
   }
 
   @Get(':id/steps/contactInfo')
