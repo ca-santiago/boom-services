@@ -33,4 +33,8 @@ export class SignatureRepo {
     const result = await this.model.findOne({ flujoId: id }).exec();
     return result ? this.mapper.toDomain(result) : null;
   }
+
+  async deleteByFlujoId(flujoId: string) { 
+    return await this.model.findOneAndDelete({ flujoId }).exec();
+  }
 }

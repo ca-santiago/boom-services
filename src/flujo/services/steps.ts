@@ -29,6 +29,16 @@ export class StepsService {
         return this.ContactInfoMapper.toPublicDTO(res);
     }
 
+    async deleteContactInfoByFlujoId(flujoId: string) {
+        const res = await this.ContactInfoRepo.findByFlujoId(flujoId);
+
+        if (!res) return;
+
+        await this.ContactInfoRepo.deleteByFlujoId(flujoId);
+        await this.ObjectStorageService.removeObject(res.id);
+        return;
+    }
+
     async getSignatureByFlujoId(id: string) {
         const res = await this.SignatureRepo.findByFlujoId(id);
         if (!res) throw new NotFoundException();
@@ -40,6 +50,15 @@ export class StepsService {
         }
     }
 
+    async deleteSignatureByFlujoId(flujoId: string) {
+        const res = await this.SignatureRepo.findByFlujoId(flujoId);
+        if (!res) return;
+
+        await this.ObjectStorageService.removeObject(res.id);
+        await this.SignatureRepo.deleteByFlujoId(flujoId);
+        return;
+    }
+
     async getFaceIdByFlujoId(id: string) {
         const res = await this.FaceIdRepo.findByFlujoId(id);
         if (!res) throw new NotFoundException();
@@ -49,5 +68,14 @@ export class StepsService {
             url,
             data: this.FaceIdMapper.toPublicDTO(res)
         }
+    }
+
+    async deleteFaceIdByFlujoId(flujoId: string) {
+        const res = await this.FaceIdRepo.findByFlujoId(flujoId);
+        if (!res) return;
+
+        await this.FaceIdRepo.deleteByFlujoid(flujoId);
+        await this.ObjectStorageService.removeObject(res.id);
+        return
     }
 }

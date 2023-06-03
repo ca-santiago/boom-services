@@ -27,4 +27,8 @@ export class FaceidRepo {
     const mapped = this.faceidMapper.toRepo(f);
     this.faceidModel.findByIdAndUpdate(f.id, mapped, { upsert: true }).exec();
   }
+
+  async deleteByFlujoid(flujoId: string) {
+    await this.faceidModel.findOneAndDelete({ flujoId }).exec();
+  }
 }

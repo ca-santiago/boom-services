@@ -33,4 +33,8 @@ export class ContactInfoRepo {
     const result = await this.model.findOne({ flujoId: id }).lean().exec();
     return result ? this.pInfoMapper.toDomain(result) : null;
   }
+
+  async deleteByFlujoId(flujoId: string) {
+    return await this.model.findOneAndDelete({ flujoId }).exec();
+  }
 }

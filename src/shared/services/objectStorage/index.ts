@@ -16,4 +16,8 @@ export class ObjectStorageService {
   async getObjectUrl(id: string) {
     return this.s3Client.getObjectWithSignedUrl(id);
   }
+
+  async removeObject(id: string) {
+    return this.s3Client.deleteObject(id);
+  }
 }

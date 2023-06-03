@@ -8,6 +8,7 @@ import { FlujoRepo } from '../repository/flujo';
 import { CreateFlujoDTO, UpdateFlujoDTO } from './dto';
 import { FlujoHelpersService } from './flujoHelpers';
 import { FlujoMapper } from '../mapper/flujo';
+import { StepsService } from './steps';
 
 interface CreateFlujoResponse {
   data: Flujo;
@@ -19,6 +20,7 @@ export class FlujoService {
     private flujoRepo: FlujoRepo,
     private flujoMapper: FlujoMapper,
     private flujoHelpers: FlujoHelpersService,
+    private stepsService: StepsService,
   ) { }
 
   async createFlujo(
@@ -59,7 +61,17 @@ export class FlujoService {
   }
 
   async delete(id: string) {
-    return await this.flujoRepo.delete(id);
+    const flujo = await this.flujoRepo.findById(id);
+    if (!flujo) return;
+
+    await Promise.all([
+      this.stepsService.deleteSignatureByFlujoId(flujo.id),
+      this.stepsService.deleteFaceIdByFlujoId(flujo.id),
+      this.stepsService.deleteContactInfoByFlujoId(flujo.id)
+    ]);
+
+    await this.flujoRepo.delete(id);
+    return;
   }
 
   async findById(id: string): Promise<Flujo | null> {
