@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, InternalServerErrorException, Param, Post, Put, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { CompletionService } from "../services/completion";
-import { PutFaceidDTO, PutContactInfoDTO, PutSignatureDTO } from "../services/dto";
+import { PutFaceidDTO, PutContactInfoDTO, PutSignatureDTO, StartFlujoParams } from "../services/dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FinishFlujoProps } from "../services/completion.types";
 
@@ -13,11 +13,11 @@ export class CompletionController {
     // TODO: Fix endpoint structure - :id/start
     @Post('start/:id')
     async start(
-        @Param('id') id: string
+        @Param('id') id: string,
+        @Body() params: StartFlujoParams
     ) {
         try {
-            const res = this.completionService.startFlujo(id);
-            return res;
+            return this.completionService.startFlujo(id, params.passcode);
         } catch (err) {
             throw new InternalServerErrorException('Failed starting flujo', id);
         }

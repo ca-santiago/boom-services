@@ -8,6 +8,7 @@ export interface IFlujo {
   description?: string;
   startTime?: number;
   completedSteps: string[];
+  passcode?: string;
 }
 
 export enum FlujoStatus {
@@ -34,4 +35,6 @@ export interface FlujoRepoDTO extends Exclude<IFlujo, 'id'> {
 /**
  * Public data of an entity, define which information should be returned on requets
  */
-export interface FlujoPublicDTO extends IFlujo {}
+export interface FlujoPublicDTO extends Omit<IFlujo, "passcode"> {
+  needPasscode: boolean;
+}

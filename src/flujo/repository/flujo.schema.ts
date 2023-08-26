@@ -13,4 +13,5 @@ export const FlujoSchema = new Schema<FlujoDocument>({
   completionTime: String,
   startTime: Number,
   completedSteps: [String],
+  passcode: String,
 });

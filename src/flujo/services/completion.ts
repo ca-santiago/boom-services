@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { FlujoRepo } from "../repository/flujo";
 import { FaceidRepo } from "../repository/faceid";
 import { ObjectStorageService } from "src/shared/services/objectStorage";
@@ -18,11 +18,13 @@ import { SignatureMapper } from "../mapper/signature";
 import { Signature } from "../domain/signature";
 import { FinishFlujoProps, FinishFlujoResult, FinishFlujoResultType } from "./completion.types";
 import { FlujoHelpersService } from "./flujoHelpers";
+import { FlujoMapper } from "../mapper/flujo";
 
 @Injectable()
 export class CompletionService {
     constructor(
         private flujoRepo: FlujoRepo,
+        private flujoMapper: FlujoMapper,
         private faceidRepo: FaceidRepo,
         private jwtService: JwtService,
         private signatureRepo: SignatureRepo,
@@ -48,10 +50,14 @@ export class CompletionService {
 
     // ACTIONS
 
-    async startFlujo(id: string) {
+    async startFlujo(id: string, passcode?: string) {
         const existOrNull = await this.flujoRepo.findById(id);
-        if (!existOrNull) throw new UnauthorizedException();
+        if (!existOrNull) throw new NotFoundException();
         const { status, completionTime, startTime } = existOrNull;
+
+        if (existOrNull.passcode && existOrNull.passcode !== passcode) {
+            throw new ForbiddenException();
+        }
 
         // Verify againt started status
         const isStarted = status === FlujoStatus.STARTED;
@@ -76,7 +82,7 @@ export class CompletionService {
             return {
                 token,
                 secondsLeft,
-                flujo: existOrNull,
+                flujo: this.flujoMapper.toPublicDTO(existOrNull),
             };
         }
 
@@ -99,7 +105,7 @@ export class CompletionService {
             return {
                 token,
                 secondsLeft: updatedSecondsLeft,
-                flujo: updated,
+                flujo: this.flujoMapper.toPublicDTO(updated),
             };
         }
 
@@ -162,7 +168,7 @@ export class CompletionService {
         }
         await this.flujoRepo.save(updated);
 
-        return { flujo: updated, resultType: FinishFlujoResultType.OK };
+        return { flujo: this.flujoMapper.toPublicDTO(updated), resultType: FinishFlujoResultType.OK };
     }
 
     async putFaceId(dto: PutFaceidDTO) {

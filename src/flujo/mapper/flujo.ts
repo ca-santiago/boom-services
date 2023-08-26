@@ -24,8 +24,10 @@ export class FlujoMapper {
   }
 
   toPublicDTO(domain: Flujo): FlujoPublicDTO {
+    const { passcode, ...rest } = domain;
     const out: FlujoPublicDTO = {
-      ...domain,
+      ...rest,
+      needPasscode: !!domain.passcode
     };
     return out;
   }

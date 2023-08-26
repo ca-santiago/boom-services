@@ -11,5 +11,6 @@ export class Flujo implements IFlujo {
     public completedSteps: string[],
     public description?: string, 
     public startTime?: number,
+    public passcode?: string,
   ) {}
 }

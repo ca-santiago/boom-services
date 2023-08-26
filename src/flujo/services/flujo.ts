@@ -37,7 +37,8 @@ export class FlujoService {
       completionTime: dto.completionTime,
       title: dto.title,
       description: dto.description,
-      completedSteps: []
+      completedSteps: [],
+      passcode: dto.passcode ?? undefined,
     }
 
     // Save instance

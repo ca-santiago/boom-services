@@ -33,7 +33,6 @@ export class FlujoController {
   async create(
     @Body() dto: CreateFlujoDTO,
     @Res() res: Response,
-    @Req() req: Request,
   ) {
     const servicePayload = await this.flujoService.createFlujo(dto);
     res.status(201).json(servicePayload).end();

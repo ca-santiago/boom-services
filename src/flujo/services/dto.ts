@@ -31,6 +31,10 @@ export class CreateFlujoDTO {
   @IsString()
   @Matches(/^\d+[hm]$/)
   completionTime: string;
+
+  @IsString()
+  @IsOptional()
+  passcode: string;
 }
 
 export class UpdateFlujoDTO {
@@ -43,6 +47,12 @@ export class UpdateFlujoDTO {
   // @IsString()
   // @Matches(/^\d+[hm]$/)
   // completionTime: string;
+}
+
+export class StartFlujoParams {
+  @IsString()
+  @IsOptional()
+  passcode: string;
 }
 
 export class PutFaceidDTO {
