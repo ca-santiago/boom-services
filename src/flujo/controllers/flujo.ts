@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { CreateFlujoDTO, UpdateFlujoDTO } from '../services/dto';
 import { FlujoService } from '../services/flujo';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { StepsService } from '../services/steps';
 
 

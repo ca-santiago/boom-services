@@ -87,11 +87,11 @@ export class FlujoService {
           status: FlujoStatus.LOCKED,
         }
         await this.flujoRepo.save(updated);
-        return { ...updated }
+        return { ...this.flujoMapper.toPublicDTO(updated) }
       }
     }
 
-    return existsOrNull;
+    return this.flujoMapper.toPublicDTO(existsOrNull);
   }
 
   async findAll(page = 0) {
