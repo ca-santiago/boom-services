@@ -77,6 +77,8 @@ export class FlujoService {
 
   async findById(id: string): Promise<Flujo | null> {
     const existsOrNull = await this.flujoRepo.findById(id);
+    if (!existsOrNull) throw new NotFoundException();
+
     if (existsOrNull?.status === FlujoStatus.STARTED) {
       const deadline = this.flujoHelpers.sumCompletionTime(existsOrNull.startTime, existsOrNull.completionTime);
       const timeLeft = this.flujoHelpers.calculateSecondsLeftFromDateToDate(Date.now(), deadline)
