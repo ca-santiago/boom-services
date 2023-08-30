@@ -47,7 +47,7 @@ export class FlujoController {
 
   @Get(':id')
   async getById(@Param('id') id) {
-    const result = await this.flujoService.findById(id);
+    const result = await this.flujoService.findById(id, false);
     if (result == null) {
       throw new NotFoundException();
     }

@@ -75,13 +75,14 @@ export class FlujoService {
     return;
   }
 
-  async findById(id: string): Promise<Flujo | null> {
+  async findById(id: string, getPublic: boolean): Promise<Flujo | null> {
     const existsOrNull = await this.flujoRepo.findById(id);
     if (!existsOrNull) throw new NotFoundException();
 
-    if (existsOrNull?.status === FlujoStatus.STARTED) {
-      const deadline = this.flujoHelpers.sumCompletionTime(existsOrNull.startTime, existsOrNull.completionTime);
-      const timeLeft = this.flujoHelpers.calculateSecondsLeftFromDateToDate(Date.now(), deadline)
+    const { startTime, completionTime } = existsOrNull;
+
+    if (existsOrNull.status === FlujoStatus.STARTED) {
+      const timeLeft = this.flujoHelpers.getSecondsLeft(startTime, completionTime);
 
       if (timeLeft <= 0) {
         const updated: Flujo = {
@@ -93,7 +94,7 @@ export class FlujoService {
       }
     }
 
-    return this.flujoMapper.toPublicDTO(existsOrNull);
+    return getPublic ? this.flujoMapper.toPublicDTO(existsOrNull) : this.flujoMapper.toPrivateDTO(existsOrNull);
   }
 
   async findAll(page = 0) {

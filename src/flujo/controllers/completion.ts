@@ -1,8 +1,9 @@
-import { BadRequestException, Body, Controller, InternalServerErrorException, Param, Post, Put, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Param, Post, Put, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { CompletionService } from "../services/completion";
 import { PutFaceidDTO, PutContactInfoDTO, PutSignatureDTO, StartFlujoParams } from "../services/dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FinishFlujoProps } from "../services/completion.types";
+import { deprecate } from "util";
 
 @Controller('completion')
 export class CompletionController {
@@ -10,7 +11,27 @@ export class CompletionController {
         private completionService: CompletionService
     ) { }
 
-    // TODO: Fix endpoint structure - :id/start
+    // Public endpoints for flujos data
+    @Get(':id')
+    async getFlujoData(
+        @Param('id') id: string
+    ) {
+        try {
+            return this.completionService.getFlujo(id);
+        } catch (err) {
+
+        }
+    }
+
+    @Post(':id/start')
+    async startV2(
+        @Param('id') id: string,
+        @Body() params: StartFlujoParams
+    ) {
+        return this.completionService.startFlujo(id, params.passcode);
+    }
+
+    /** @deprecated */
     @Post('start/:id')
     async start(
         @Param('id') id: string,

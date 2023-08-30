@@ -38,3 +38,5 @@ export interface FlujoRepoDTO extends Exclude<IFlujo, 'id'> {
 export interface FlujoPublicDTO extends Omit<IFlujo, "passcode"> {
   needPasscode: boolean;
 }
+
+export interface FlujoPrivateDTO extends IFlujo {}

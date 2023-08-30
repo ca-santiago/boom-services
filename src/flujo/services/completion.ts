@@ -7,7 +7,7 @@ import { Flujo } from "../domain/flujo";
 import { JwtService } from "@nestjs/jwt";
 import { StepAccessTokenPayload } from "../interfaces/step.token";
 import { PutContactInfoDTO, PutFaceidDTO, PutSignatureDTO } from "./dto";
-import { FlujoStatus, StepType } from "../interfaces/flujo";
+import { FlujoPublicDTO, FlujoStatus, StepType } from "../interfaces/flujo";
 import { v4 } from 'uuid';
 import { StepFileStatus } from "../interfaces/common";
 import { ContactInfoRepo } from "../repository/contactInfo";
@@ -50,13 +50,19 @@ export class CompletionService {
 
     // ACTIONS
 
-    async startFlujo(id: string, passcode?: string) {
-        const existOrNull = await this.flujoRepo.findById(id);
-        if (!existOrNull) throw new NotFoundException();
-        const { status, completionTime, startTime } = existOrNull;
+    async getFlujo(id: string): Promise<FlujoPublicDTO> {
+        const flujo = await this.flujoRepo.findById(id);
+        if (!flujo) throw new NotFoundException();
+        return this.flujoMapper.toPublicDTO(flujo);
+    }
 
-        if (existOrNull.passcode && existOrNull.passcode !== passcode) {
-            throw new ForbiddenException();
+    async startFlujo(id: string, passcode?: string) {
+        const flujo = await this.flujoRepo.findById(id);
+        if (!flujo) throw new NotFoundException();
+        const { status, completionTime, startTime } = flujo;
+
+        if (flujo.passcode && flujo.passcode !== passcode) {
+            throw new UnauthorizedException();
         }
 
         // Verify againt started status
@@ -68,34 +74,34 @@ export class CompletionService {
         if (isStarted && secondsLeft < 1) {
             // Save locked and return
             const updated: Flujo = {
-                ...existOrNull,
+                ...flujo,
                 status: FlujoStatus.LOCKED,
             }
             await this.flujoRepo.save(updated);
-            throw new UnauthorizedException();
+            throw new ConflictException();
         }
 
         if (isStarted) {
-            const payload: StepAccessTokenPayload = { id: existOrNull.id };
+            const payload: StepAccessTokenPayload = { id: flujo.id };
             const token: string = this.jwtService.sign(payload, { expiresIn: secondsLeft });
             // Return
             return {
                 token,
                 secondsLeft,
-                flujo: this.flujoMapper.toPublicDTO(existOrNull),
+                flujo: this.flujoMapper.toPublicDTO(flujo),
             };
         }
 
         // If is just created, lets start it
         if (status === FlujoStatus.CREATED) {
             // Generate token
-            const payload: StepAccessTokenPayload = { id: existOrNull.id };
+            const payload: StepAccessTokenPayload = { id: flujo.id };
             const updatedSecondsLeft = this.flujoHelpers.calculateSecondsLeftFromDateToDate(_startTime, deadline);
             const token: string = this.jwtService.sign(payload, { expiresIn: updatedSecondsLeft });
 
             // Update and save
             const updated: Flujo = {
-                ...existOrNull,
+                ...flujo,
                 status: FlujoStatus.STARTED,
                 startTime: Date.now(),
             }
@@ -110,7 +116,7 @@ export class CompletionService {
         }
 
         if (status === FlujoStatus.LOCKED || status === FlujoStatus.FINISHED) {
-            throw new UnauthorizedException();
+            throw new ConflictException();
         }
 
         throw new UnauthorizedException('Invalid status');

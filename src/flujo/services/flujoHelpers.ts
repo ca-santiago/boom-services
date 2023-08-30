@@ -62,4 +62,9 @@ export class FlujoHelpersService {
 
         return secondsLeft;
     }
+
+    getSecondsLeft(startTime: number, completionTime: string): number {
+        const deadline = this.sumCompletionTime(startTime, completionTime);
+        return this.calculateSecondsLeftFromDateToDate(Date.now(), deadline)
+    }
 }

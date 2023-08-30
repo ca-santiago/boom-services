@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Flujo } from '../domain/flujo';
 import { FlujoMapper } from '../mapper/flujo';
 import { FlujoDocument } from './flujo.schema';
-import { FlujoPublicDTO, FlujoRepoDTO } from '../interfaces/flujo';
+import { FlujoPrivateDTO, FlujoPublicDTO, FlujoRepoDTO } from '../interfaces/flujo';
 
 @Injectable()
 export class FlujoRepo {

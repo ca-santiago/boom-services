@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Flujo } from '../domain/flujo';
-import { IFlujo, FlujoPublicDTO, FlujoRepoDTO } from '../interfaces/flujo';
+import { IFlujo, FlujoPublicDTO, FlujoRepoDTO, FlujoPrivateDTO } from '../interfaces/flujo';
 
 @Injectable()
 export class FlujoMapper {
@@ -35,5 +35,13 @@ export class FlujoMapper {
   fromRepoToPublicDTO(raw: FlujoRepoDTO): FlujoPublicDTO {
     // TODO: Refactor this in order to reduce the operation speed?
     return this.toPublicDTO(this.toDomain(raw));
+  }
+
+  fromRepoToPrivateDTO(raw: FlujoRepoDTO): FlujoPrivateDTO {
+    return this.toPrivateDTO(this.toDomain(raw));
+  }
+
+  toPrivateDTO(domain: Flujo): FlujoPrivateDTO {
+    return Object.assign({}, domain);
   }
 }
