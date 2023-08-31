@@ -16,11 +16,7 @@ export class CompletionController {
     async getFlujoData(
         @Param('id') id: string
     ) {
-        try {
-            return this.completionService.getFlujo(id);
-        } catch (err) {
-
-        }
+        return this.completionService.getFlujo(id);
     }
 
     @Post(':id/start')
@@ -29,19 +25,6 @@ export class CompletionController {
         @Body() params: StartFlujoParams
     ) {
         return this.completionService.startFlujo(id, params.passcode);
-    }
-
-    /** @deprecated */
-    @Post('start/:id')
-    async start(
-        @Param('id') id: string,
-        @Body() params: StartFlujoParams
-    ) {
-        try {
-            return this.completionService.startFlujo(id, params.passcode);
-        } catch (err) {
-            throw new InternalServerErrorException('Failed starting flujo', id);
-        }
     }
 
     @Post(':id/finish')
